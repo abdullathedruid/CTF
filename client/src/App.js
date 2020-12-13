@@ -2,18 +2,16 @@ import React, {Component} from 'react';
 import AppBar from '@material-ui/core/AppBar'
 import Typography from '@material-ui/core/Typography'
 import Grid from '@material-ui/core/Grid'
-import {CardMedia} from '@material-ui/core'
 
 import CreateMarket from './CreateMarket'
 import Bets from './Bets'
-import Arbitrator from './Arbitrator'
+import Betslip from './Betslip'
 
 import Web3 from 'web3';
 import EventContract from './SCEvent.json'
 import ArbitratorContract from './SimpleCentralizedArbitrator.json'
 import FactoryContract from './SCFactory.json'
 
-import ipfsPublish from './ipfs-publish.js'
 const ipfs = require("nano-ipfs-store").at("https://ipfs.infura.io:5001");
 
 const enc = new TextEncoder()
@@ -292,7 +290,7 @@ class App extends Component {
         <Bets handleDispute={this.handleDispute} handleSetOutcome = {this.handleSetOutcome} handleOpenSetOutcome={this.handleOpenSetOutcome} handleCloseSetOutcome={this.handleCloseSetOutcome} handlePlaceBet={this.handlePlaceBet} handleChangePurchaseSize={this.handleChangePurchaseSize} state={this.state} openSetOutcome={this.state.openSetOutcome} open={this.state.openBet} handleClose={this.handleCloseBet} handleOpen={this.handleOpenBet}/>
       </Grid>
       <Grid item xs={4}>
-        <Arbitrator handleDisputeOutcome={this.handleDisputeOutcome} state={this.state}/>
+        <Betslip handleDisputeOutcome={this.handleDisputeOutcome} state={this.state}/>
       </Grid>
     </Grid>
     </main>

@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import {Container, TextField, MenuItem, Button} from '@material-ui/core/'
-import Typography from '@material-ui/core/Typography'
 import generateMetaEvidence from './generate-meta-evidence.js'
 import CardMedia from '@material-ui/core/CardMedia'
 
@@ -31,8 +30,7 @@ class CreateMarket extends Component {
       question: '',
       options: [],
       optionsDesc: [],
-      endTime: 0,
-      resultTime: 0
+      endTime: 0
     }
   }
 
@@ -78,12 +76,8 @@ class CreateMarket extends Component {
     this.setState({endTime: event.target.value})
   }
 
-  handleChangeResultTime = (event) => {
-    this.setState({resultTime: event.target.value})
-  }
-
   handleSubmit = (e) => {
-    let metaevidence = generateMetaEvidence(this.state.title,this.state.category,this.state.description,this.state.question,this.state.options,this.state.optionsDesc,'0xHI')
+    let metaevidence = generateMetaEvidence(this.state.title,this.state.category,this.state.description,this.state.question,this.state.options,this.state.options,'0xHI')
 
     this.props.createMarket(metaevidence,this.state.number,this.state.endTime,this.state.resultTime);
   }
@@ -91,7 +85,7 @@ class CreateMarket extends Component {
   render() {
     return(
       <Container fixed>
-      <img style={{ width: "100%"}} src="create_markets.png" />
+      <img style={{ width: "100%"}} src="create_markets.png" alt="create market"/>
       <CardMedia style={{ height: "200px" }} image="/market.jpg" />
         <form autocomplete="off">
         <div>
@@ -105,6 +99,9 @@ class CreateMarket extends Component {
     ))}</TextField>
         </div>
         <div>
+          <TextField required id="question" label="Question" fullWidth onChange={this.handleChangeQuestion}/>
+        </div>
+        <div>
           <TextField required
             id="standard-multiline-static"
             label="Description"
@@ -113,9 +110,6 @@ class CreateMarket extends Component {
             rows={4}
             onChange ={this.handleChangeDescription}
           />
-        </div>
-        <div>
-          <TextField required id="question" label="Question" fullWidth onChange={this.handleChangeQuestion}/>
         </div>
         <div>
         <TextField select label="Number of Options" fullWidth value={this.state.number} onChange={this.handleChangeNumber}> {numbers.map((option) => (
@@ -129,9 +123,7 @@ class CreateMarket extends Component {
           this.state.options.map((option,key) => {
             return(
             <div>
-              <TextField label={"Option "+(key+1)} id={"o"+key} value = {this.state.options[key]} onChange={this.handleChangeOption}>
-              </TextField>
-              <TextField label={"Description "+(key+1)} id={"d"+key} value = {this.state.optionsDesc[key]} onChange={this.handleChangeOptionDesc}>
+              <TextField label={"Option "+(key+1)} id={"o"+key} value = {this.state.options[key]} onChange={this.handleChangeOption} fullWidth>
               </TextField>
             </div>
         )})
@@ -139,9 +131,6 @@ class CreateMarket extends Component {
         </div>
         <div>
           <TextField label="When to stop accepting bets (UNIX)" fullWidth value={this.state.endTime} onChange={this.handleChangeEndTime}/>
-        </div>
-        <div>
-          <TextField label="When will the answer be known (UNIX)" fullWidth value={this.state.resultTime} onChange={this.handleChangeResultTime}/>
         </div>
           <div style={{
             margin: 'auto',

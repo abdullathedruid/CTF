@@ -48,7 +48,7 @@ class DisputeCard extends Component {
 
 const disputes = []
 
-class Arbitrator extends Component {
+class Betslip extends Component {
   constructor(props) {
     super()
   }
@@ -85,4 +85,4 @@ class Arbitrator extends Component {
   }
 }
 
-export default Arbitrator
+export default Betslip
