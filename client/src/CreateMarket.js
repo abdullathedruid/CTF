@@ -132,6 +132,9 @@ class CreateMarket extends Component {
         <div>
           <TextField label="When to stop accepting bets (UNIX)" fullWidth value={this.state.endTime} onChange={this.handleChangeEndTime}/>
         </div>
+        <div>
+          Note: New markets require $100 to fund initial liquidity.
+        </div>
           <div style={{
             margin: 'auto',
           width: '50%',

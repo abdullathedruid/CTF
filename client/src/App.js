@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import AppBar from '@material-ui/core/AppBar'
 import Typography from '@material-ui/core/Typography'
 import Grid from '@material-ui/core/Grid'
+import Button from '@material-ui/core/Button'
 
 import CreateMarket from './CreateMarket'
 import Bets from './Bets'
@@ -11,6 +12,7 @@ import Web3 from 'web3';
 import EventContract from './SCEvent.json'
 import ArbitratorContract from './SimpleCentralizedArbitrator.json'
 import FactoryContract from './SCFactory.json'
+import FakeDai from './contracts/FakeDai.json'
 
 const ipfs = require("nano-ipfs-store").at("https://ipfs.infura.io:5001");
 
@@ -40,7 +42,8 @@ class App extends Component {
       quotedAmount: 0,
       openSetOutcome: false,
       openSetOutcomeBet: 0,
-      web3: null
+      web3: null,
+      balance: 0
     }
     this.addEventData = this.addEventData.bind(this)
   }
@@ -158,6 +161,17 @@ class App extends Component {
     }
   }
 
+  handleMint = (e) => {
+    try{
+      this.state.currency.methods.mint(this.state.account,this.state.web3.utils.toWei('100')).send({from: this.state.account})
+      .once('receipt', ((receipt) => {
+        console.log('100 USD minted')
+      }))
+    } catch (err) {
+      console.log('Error', err)
+    }
+  }
+
   addEventData (address,title,description,question,options,endTime,resultTime, outcome, price, balances, state) {
     var obj = {
       address: address,
@@ -204,6 +218,13 @@ class App extends Component {
 
     const factory = new web3.eth.Contract(FactoryContract.abi, '0xCC484690bfeA257DD50f7a6865D0793d16Ac3E2A')
     this.setState({factory})
+
+    const currency = new web3.eth.Contract(FakeDai.abi, '0xD68B69809EE1141d424cFcB1BE66c67f13E2EC06')
+    this.setState({currency})
+
+    const balance = await currency.methods.balanceOf(this.state.account).call()
+    this.setState({balance})
+
     const numEvents = await factory.methods.getNumberOfMarkets().call()
     this.setState({numberOfEvents: numEvents})
     const arbitrator = new web3.eth.Contract(ArbitratorContract.abi,'0xaededC9A349B19508cdAeD4C6F8CF244413260E7')
@@ -215,6 +236,7 @@ class App extends Component {
       .then((response) => {
         this.addDisputeData(response)
       })
+
 
     }
 
@@ -256,12 +278,19 @@ class App extends Component {
     }
   }
 
+  async updateBalance() {
+    const balance = await this.state.currency.methods.balanceOf(this.state.account).call()
+    this.setState({balance})
+  }
+
 
   listenForEvents = () => {
-    /*if(this.state.loading == false) {
+    if(this.state.loading == false) {
     //console.log('address',this.state.event[0].events)
-    this.state.event[0].events.MetaEvidence({}).on('data',(event,error) => {
-      console.log(event,error)
+    this.state.currency.events.Transfer().on('data',(event,error) => {
+      if(event.returnValues.to==this.state.account) {
+        this.updateBalance()
+      }
     })
   }
     //contract.DisputeCreate({}).on('data', (event,error) => {})*/
@@ -276,8 +305,14 @@ class App extends Component {
           <img style={{ width: "50%" }} src="supreme_header.png" />
           <Typography variant="h6" color="inherit" noWrap>
             Your address: {this.state.account}
-            </Typography>
-            </AppBar>
+          </Typography>
+          <div>
+          <Typography variant="h6" color="inherit" noWrap>
+            Your balance: ${Number.parseFloat(this.state.web3.utils.fromWei(this.state.balance)).toFixed(2)}
+          </Typography>
+          <Button colour="primary" type="submit" size="large" style = {{backgroundColor: "#FFFFFF", color : "#ED1C24"}}  variant="contained" component="span" onClick={this.handleMint}> Give me $100! </Button>
+          </div>
+        </AppBar>
       </header>
     <main>
     <br/>
