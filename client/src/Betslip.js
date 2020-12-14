@@ -11,6 +11,7 @@ import {List, ListItem,CardMedia} from '@material-ui/core'
 import {PropTypes} from 'react'
 import CancelIcon from '@material-ui/icons/Cancel';
 import IconButton from '@material-ui/core/IconButton';
+import TextField from '@material-ui/core/TextField'
 
 class Betslip extends Component {
   constructor(props) {
@@ -35,13 +36,6 @@ class Betslip extends Component {
     this.props.alterBet(key,k)
   }
 
-  calcPrice = (e) => {
-    var i=0;
-    this.props.state.betslip.map((bet,key) => {
-    })
-    return e + ' USD'
-  }
-
   render() {
     if(this.props.state.betslip.length==0) {
       return(
@@ -51,6 +45,45 @@ class Betslip extends Component {
         <div>
           No bets in betslip
         </div>
+        </Container>
+      )
+    } else if(this.props.state.betslip.length==1) {
+      return(
+        <Container>
+        <img style={{ width: "100%"}} src="dispute_outcome.png" />
+        <CardMedia style={{ height: "200px" }} image="/court.png" />
+        <div>
+        <List>
+        {this.props.state.betslip.map((bet, key)=> {
+          return(
+            <ListItem>
+              <Container>
+              <IconButton color="primary" aria-label="upload picture" component="span" id={key} onClick={this.handleRemoveBet}>
+                <CancelIcon id={key}/>
+              </IconButton>
+              {this.props.state.eventData[this.props.state.eventData.map(function(o) {return o.address;}).indexOf(bet.event)].title}
+              <div>
+                <ButtonGroup color="primary" >
+                {this.props.state.eventData[this.props.state.eventData.map(function(o) {return o.address;}).indexOf(bet.event)].price.map((p,k) => {
+                  return(
+                    <Button onClick={e => this.alterBet(e,k,key)}
+                    variant={this.containedIfIndex(bet.outcome,k,this.props.state.eventData[this.props.state.eventData.map(function(o) {return o.address;}).indexOf(bet.event)].price.length)}> {this.props.state.eventData[this.props.state.eventData.map(function(o) {return o.address;}).indexOf(bet.event)].options[k]}:${p} </Button>
+                  )
+                })}
+                </ButtonGroup>
+              </div>
+              </Container>
+            </ListItem>
+          )
+        })}
+        </List>
+        </div>
+        <div>
+          <TextField label="Outcome tokens to buy" fullWidth value={this.props.state.quotedAmount} onChange={this.props.handleChangePurchaseSingleSize}></TextField>
+          <TextField label="Price" fullWidth value={this.props.state.quotedPrice}></TextField>
+          <Button colour="primary" onClick={this.props.handleSingleSubmit} type="submit" size="large" style = {{backgroundColor: "#ED1C24", color : "#FFFFFF"}}  variant="contained" component="span" > Submit single bet </Button>
+        </div>
+
         </Container>
       )
     } else {
@@ -85,8 +118,9 @@ class Betslip extends Component {
         </List>
         </div>
         <div>
-        COMBO BET
-        Your combo bet that returns $100 will cost {this.calcPrice(100)}
+          <TextField label="Outcome tokens to buy" fullWidth value={this.props.state.quotedAmount} onChange={this.props.handleChangePurchaseSingleSize}></TextField>
+          <TextField label="Price" fullWidth value={this.props.state.quotedPrice}></TextField>
+          <Button colour="primary" type="submit" size="large" style = {{backgroundColor: "#ED1C24", color : "#FFFFFF"}}  variant="contained" component="span" > Submit {"C-".repeat(this.props.state.betslip.length-1)}COMBO bet </Button>
         </div>
 
         </Container>
