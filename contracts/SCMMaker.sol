@@ -173,7 +173,7 @@ contract SCMMaker is IArbitrable, IEvidence, ISCMMaker, IERC1155Receiver{
                 b)
               ));
             }
-            new_cost = ABDKMath.mul(_b,ABDKMath.ln(sumtotal));
+            new_cost = ABDKMath.mul(b,ABDKMath.ln(sumtotal));
             spot_price = ABDKMath.sub(new_cost,current_cost);
             uint uprice = ABDKMath.mulu(spot_price,10**18);
             uint uamount = ABDKMath.mulu(amount,10**18);

@@ -43,15 +43,15 @@
     "absolutePath": "/C/Users/Abdulla/apps/CTF/contracts/interfaces/ISCMMaker.sol",
     "exportedSymbols": {
       "ISCMMaker": [
-        5941
+        5878
       ]
     },
-    "id": 5942,
+    "id": 5879,
     "license": null,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 5929,
+        "id": 5866,
         "literals": [
           "solidity",
           ">=",
@@ -67,9 +67,9 @@
         "contractKind": "interface",
         "documentation": null,
         "fullyImplemented": false,
-        "id": 5941,
+        "id": 5878,
         "linearizedBaseContracts": [
-          5941
+          5878
         ],
         "name": "ISCMMaker",
         "nodeType": "ContractDefinition",
@@ -78,7 +78,7 @@
             "body": null,
             "documentation": null,
             "functionSelector": "7249f3e4",
-            "id": 5940,
+            "id": 5877,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -86,17 +86,17 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 5936,
+              "id": 5873,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 5931,
+                  "id": 5868,
                   "mutability": "mutable",
                   "name": "_user",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 5940,
+                  "scope": 5877,
                   "src": "70:13:11",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -105,7 +105,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 5930,
+                    "id": 5867,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "70:7:11",
@@ -120,12 +120,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 5933,
+                  "id": 5870,
                   "mutability": "mutable",
                   "name": "_outcome",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 5940,
+                  "scope": 5877,
                   "src": "85:13:11",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -134,7 +134,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 5932,
+                    "id": 5869,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
                     "src": "85:4:11",
@@ -148,12 +148,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 5935,
+                  "id": 5872,
                   "mutability": "mutable",
                   "name": "amount",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 5940,
+                  "scope": 5877,
                   "src": "100:13:11",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -162,7 +162,7 @@
                     "typeString": "int128"
                   },
                   "typeName": {
-                    "id": 5934,
+                    "id": 5871,
                     "name": "int128",
                     "nodeType": "ElementaryTypeName",
                     "src": "100:6:11",
@@ -178,17 +178,17 @@
               "src": "69:45:11"
             },
             "returnParameters": {
-              "id": 5939,
+              "id": 5876,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 5938,
+                  "id": 5875,
                   "mutability": "mutable",
                   "name": "spot_price",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 5940,
+                  "scope": 5877,
                   "src": "133:17:11",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -197,7 +197,7 @@
                     "typeString": "int128"
                   },
                   "typeName": {
-                    "id": 5937,
+                    "id": 5874,
                     "name": "int128",
                     "nodeType": "ElementaryTypeName",
                     "src": "133:6:11",
@@ -212,14 +212,14 @@
               ],
               "src": "132:19:11"
             },
-            "scope": 5941,
+            "scope": 5878,
             "src": "51:101:11",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 5942,
+        "scope": 5879,
         "src": "26:129:11"
       }
     ],
@@ -229,15 +229,15 @@
     "absolutePath": "/C/Users/Abdulla/apps/CTF/contracts/interfaces/ISCMMaker.sol",
     "exportedSymbols": {
       "ISCMMaker": [
-        5941
+        5878
       ]
     },
-    "id": 5942,
+    "id": 5879,
     "license": null,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 5929,
+        "id": 5866,
         "literals": [
           "solidity",
           ">=",
@@ -253,9 +253,9 @@
         "contractKind": "interface",
         "documentation": null,
         "fullyImplemented": false,
-        "id": 5941,
+        "id": 5878,
         "linearizedBaseContracts": [
-          5941
+          5878
         ],
         "name": "ISCMMaker",
         "nodeType": "ContractDefinition",
@@ -264,7 +264,7 @@
             "body": null,
             "documentation": null,
             "functionSelector": "7249f3e4",
-            "id": 5940,
+            "id": 5877,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -272,17 +272,17 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 5936,
+              "id": 5873,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 5931,
+                  "id": 5868,
                   "mutability": "mutable",
                   "name": "_user",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 5940,
+                  "scope": 5877,
                   "src": "70:13:11",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -291,7 +291,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 5930,
+                    "id": 5867,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "70:7:11",
@@ -306,12 +306,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 5933,
+                  "id": 5870,
                   "mutability": "mutable",
                   "name": "_outcome",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 5940,
+                  "scope": 5877,
                   "src": "85:13:11",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -320,7 +320,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 5932,
+                    "id": 5869,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
                     "src": "85:4:11",
@@ -334,12 +334,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 5935,
+                  "id": 5872,
                   "mutability": "mutable",
                   "name": "amount",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 5940,
+                  "scope": 5877,
                   "src": "100:13:11",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -348,7 +348,7 @@
                     "typeString": "int128"
                   },
                   "typeName": {
-                    "id": 5934,
+                    "id": 5871,
                     "name": "int128",
                     "nodeType": "ElementaryTypeName",
                     "src": "100:6:11",
@@ -364,17 +364,17 @@
               "src": "69:45:11"
             },
             "returnParameters": {
-              "id": 5939,
+              "id": 5876,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 5938,
+                  "id": 5875,
                   "mutability": "mutable",
                   "name": "spot_price",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 5940,
+                  "scope": 5877,
                   "src": "133:17:11",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -383,7 +383,7 @@
                     "typeString": "int128"
                   },
                   "typeName": {
-                    "id": 5937,
+                    "id": 5874,
                     "name": "int128",
                     "nodeType": "ElementaryTypeName",
                     "src": "133:6:11",
@@ -398,14 +398,14 @@
               ],
               "src": "132:19:11"
             },
-            "scope": 5941,
+            "scope": 5878,
             "src": "51:101:11",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 5942,
+        "scope": 5879,
         "src": "26:129:11"
       }
     ],
@@ -417,7 +417,7 @@
   },
   "networks": {},
   "schemaVersion": "3.3.0",
-  "updatedAt": "2020-12-14T21:26:30.603Z",
+  "updatedAt": "2020-12-14T21:55:46.831Z",
   "devdoc": {
     "methods": {}
   },
