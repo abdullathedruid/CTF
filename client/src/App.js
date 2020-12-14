@@ -38,15 +38,13 @@ class App extends Component {
       eventData: [],
       disputeData: [],
       numberOfEvents: 0,
-      openBet: false,
-      openBetBet: 0,
-      openBetOption: 1,
       quotedPrice: 0,
       quotedAmount: 0,
       openSetOutcome: false,
       openSetOutcomeBet: 0,
       web3: null,
-      balance: 0
+      balance: 0,
+      betslip: []
     }
     this.addEventData = this.addEventData.bind(this)
   }
@@ -55,12 +53,6 @@ class App extends Component {
     this.setState({openBet: false})
     this.setState({openBetBet: 0})
     this.setState({openBetOption: 1})
-  }
-
-  handleOpenBet = (e,b,o) => {
-    this.setState({openBet: true})
-    this.setState({openBetBet: b})
-    this.setState({openBetOption: o})
   }
 
   handleCloseSetOutcome = (e) => {
@@ -180,6 +172,24 @@ class App extends Component {
     }
   }
 
+  handleRemoveBet = (e) => {
+    var obj = [...this.state.betslip]
+    if(e !== -1) {
+      obj.splice(e,1);
+    }
+    this.setState({betslip: obj})
+  }
+
+  handleOpenBet = (e,b,o) => {
+    if(this.state.betslip.map(function(o) {return o.event; }).indexOf(this.state.eventData[b].address) < 0) {
+      var obj = {
+        event: this.state.eventData[b].address,
+        outcome: o
+      }
+      this.setState({betslip: [...this.state.betslip, obj]})
+    }
+  }
+
   addEventData (address,title,description,question,options,endTime,resultTime, outcome, price, balances, state) {
     var obj = {
       address: address,
@@ -265,28 +275,24 @@ class App extends Component {
 
       var state = await ev.methods.status().call()
 
-      var metaevidence
-      await ev.getPastEvents('MetaEvidence', {fromBlock: 0, toBlock: 'latest'})
-      .then((evx) => {
-        metaevidence = evx[0].returnValues._evidence;
-        console.log('Loading file: ',metaevidence)
-        var output = fetch('https://gateway.ipfs.io'+metaevidence)
-        .then((response) => response.json())
-        .then((responseJSON) => {
-          this.addEventData(ev._address,responseJSON.title, responseJSON.description, responseJSON.question, responseJSON.rulingOptions.descriptions,endTime,resultTime,outcome,price,balances,state)
-          console.log('Finished loading: ',metaevidence);
-          if(i>=(numEvents-1)) {
-            console.log('loaded all data')
-            this.setState({loading: false})
-          }
-        })
-      })
+
+      let output = await ev.getPastEvents('MetaEvidence', {fromBlock: 0, toBlock: 'latest'})
+      var metaevidence = output[0].returnValues._evidence;
+
+      //console.log('Loading file: ',metaevidence)
+      let ipfs = await fetch('https://gateway.ipfs.io'+metaevidence)
+      var responseJSON = await ipfs.json()
+      this.addEventData(addr,responseJSON.title, responseJSON.description, responseJSON.question, responseJSON.rulingOptions.descriptions,endTime,resultTime,outcome,price,balances,state)
+      //console.log('Finished loading: ',metaevidence);
+      if(i>=(numEvents-1)) {
+        //console.log('loaded all data')
+        this.setState({loading: false})
+      }
     }
 
     if(numEvents==0) {
       this.setState({loading: false})
     }
-
   }
 
   async updateBalance() {
@@ -370,7 +376,7 @@ class App extends Component {
         <Bets handleDispute={this.handleDispute} handleSetOutcome = {this.handleSetOutcome} handleOpenSetOutcome={this.handleOpenSetOutcome} handleCloseSetOutcome={this.handleCloseSetOutcome} handlePlaceBet={this.handlePlaceBet} handleChangePurchaseSize={this.handleChangePurchaseSize} state={this.state} openSetOutcome={this.state.openSetOutcome} open={this.state.openBet} handleClose={this.handleCloseBet} handleOpen={this.handleOpenBet}/>
       </Grid>
       <Grid item xs={4}>
-        <Betslip handleDisputeOutcome={this.handleDisputeOutcome} state={this.state}/>
+        <Betslip handleRemoveBet={this.handleRemoveBet} handleDisputeOutcome={this.handleDisputeOutcome} state={this.state}/>
       </Grid>
     </Grid>
     </main>

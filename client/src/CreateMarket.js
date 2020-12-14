@@ -81,7 +81,7 @@ class CreateMarket extends Component {
       <Container fixed>
       <img style={{ width: "100%"}} src="create_markets.png" alt="create market"/>
       <CardMedia style={{ height: "200px" }} image="/market.jpg" />
-        <form autocomplete="off">
+        <form autoComplete="off">
         <div>
           <TextField required id="title" label="Title" onChange={this.handleChangeTitle} defaultValue="" fullWidth/>
         </div>

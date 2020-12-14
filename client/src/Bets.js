@@ -77,7 +77,7 @@ class BetCard extends Component {
 
   handleOpen = (e) => {
     if(((Date.now())/1000) < this.props.state.eventData[this.props.id].endTime) {
-      this.props.handleOpen(e,this.props.id,1+parseInt(e.target.id))
+      this.props.handleOpen(e,this.props.id,parseInt(e.target.id))
     }
   }
 
@@ -139,23 +139,6 @@ class Bets extends Component {
     } else {
       return(
         <Container>
-        <Dialog scroll='body' onClose={this.handleClose} open={this.props.open}>
-        <img style={{ width: "100%"}} src="place_bets.png" alt= "place bets"/>
-          <Typography>{this.props.state.eventData[this.props.state.openBetBet].title}</Typography>
-          <Typography>You have chosen: {this.props.state.eventData[this.props.state.openBetBet].options[this.props.state.openBetOption-1]}</Typography>
-          <form>
-            <TextField fullWidth label="How many shares to buy?" onChange={this.props.handleChangePurchaseSize}/>
-            <TextField fullWidth label="Price" value={this.props.state.quotedPrice} />
-            <div style={{
-              margin: 'auto',
-            width: '50%',
-            padding: 10
-            }}>
-            <Button center="true" align = "center" colour="primary" type="submit" size="large" style = {{backgroundColor: "#ED1C24", color : "#FFFFFF"}}  variant="contained" component="span" onClick={this.handleSubmit}> Submit</Button>
-            </div>
-          </form>
-
-        </Dialog>
         <Dialog open={this.props.openSetOutcome} onClose={this.props.handleCloseSetOutcome} scroll='body'>
         <img style={{ width: "100%"}} src="set_outcome.png" alt= "set outcome"/>
         <Typography>{this.props.state.eventData[this.props.state.openSetOutcomeBet].title}</Typography>
@@ -178,7 +161,7 @@ class Bets extends Component {
             return(
               <Accordion>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}> {this.props.state.eventData[key].title} </AccordionSummary>
-                <AccordionDetails> <BetCard id={key} state={this.props.state} handleDispute={this.props.handleDispute} handleOpenSetOutcome={this.props.handleOpenSetOutcome} handleOpen={this.props.handleOpen} /> </AccordionDetails>
+                <AccordionDetails> <BetCard id={key} key={this.props.state.eventData.id} state={this.props.state} handleDispute={this.props.handleDispute} handleOpenSetOutcome={this.props.handleOpenSetOutcome} handleOpen={this.props.handleOpen} /> </AccordionDetails>
               </Accordion>
             )
           })
