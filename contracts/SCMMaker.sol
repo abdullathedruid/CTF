@@ -120,7 +120,7 @@ contract SCMMaker is IArbitrable, IEvidence, ISCMMaker, IERC1155Receiver{
         int128 TB = total_balance;
         for(uint j=0;j<numOfOutcomes;j++) {
           newq[j] = q[j];
-          if(_outcome & (1<<j) !=0) {
+          if((_outcome & (1<<j)) !=0) {
             newq[j] = ABDKMath.add(newq[j],amount);
             TB = ABDKMath.add(TB,amount);
           }
@@ -160,17 +160,17 @@ contract SCMMaker is IArbitrable, IEvidence, ISCMMaker, IERC1155Receiver{
             int128 new_cost;
             int128 sumtotal;
             for(uint j=0;j<numOfOutcomes;j++) {
-              if(_outcome & (1<<j) !=0) {
+              if((_outcome & (1<<j)) !=0) {
                 q[j] = ABDKMath.add(q[j],amount);
                 total_balance = ABDKMath.add(total_balance,amount);
               }
             }
-            int128 _b = ABDKMath.mul(total_balance,amount,alpha);
+            b = ABDKMath.mul(total_balance,alpha);
             for(uint i=0; i<numOfOutcomes;i++) {
               sumtotal = ABDKMath.add(sumtotal,
                 ABDKMath.exp(
                   ABDKMath.div(q[i],
-                _b)
+                b)
               ));
             }
             new_cost = ABDKMath.mul(_b,ABDKMath.ln(sumtotal));
@@ -184,26 +184,6 @@ contract SCMMaker is IArbitrable, IEvidence, ISCMMaker, IERC1155Receiver{
             CT.safeTransferFrom(address(this),_user,pos,uamount,'');
             current_cost = new_cost;
         }
-    }
-
-    function fu(uint256 x) public pure returns (int128) { //DEBUGGING FUNCTION - for convenience only
-        return ABDKMath.fromUInt(x);
-    }
-
-    function tu(int128 x) public pure returns (uint256) { //DEBUGGING FUNCTION - for convenience only
-        return ABDKMath.mulu(x,1000000);
-    }
-
-    function getBalanceOf(uint _outcome, address _acc) public view returns (int128) {
-        return balances[_outcome][_acc];
-    }
-
-    function outstandingShares(uint _outcome) public view returns (int128) {
-        return q[_outcome];
-    }
-
-    function totalShares() public view returns (int128) {
-        return total_balance;
     }
 
     /*

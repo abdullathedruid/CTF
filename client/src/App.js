@@ -22,6 +22,7 @@ const enc = new TextEncoder()
 
 let depositemitter = ""
 let createeventemitter = ""
+let createbetemitter = ""
 
 class App extends Component {
 
@@ -78,6 +79,7 @@ class App extends Component {
   componentWillUnmount() {
     depositemitter.removeAllListeners('data')
     createeventemitter.removeAllListeners('data')
+    createbetemitter.removeAllListeners('data')
   }
 
   async loadWeb3() {
@@ -316,10 +318,10 @@ class App extends Component {
 
     this.setState({web3})
 
-    const factory = new web3.eth.Contract(FactoryContract.abi, '0x94D65b282B7C1Bc03866c03057614F71d1885327')
+    const factory = new web3.eth.Contract(FactoryContract.abi, '0x048BFaF964D7A9468D9F0f310e00871ceeA3A29f')
     this.setState({factory})
 
-    const currency = new web3.eth.Contract(FakeDai.abi, '0xf13a7d98d47937d5255Bdf376F3d07005A8D7614')
+    const currency = new web3.eth.Contract(FakeDai.abi, '0x5BEB39Fc196941707E9aA946be73C4e05dC9F907')
     this.setState({currency})
 
     const balance = await currency.methods.balanceOf(this.state.account).call()
@@ -328,7 +330,7 @@ class App extends Component {
     const numEvents = await factory.methods.getNumberOfMarkets().call()
     this.setState({numberOfEvents: numEvents})
 
-    const router = new web3.eth.Contract(Router.abi, '0x76A51ee70D8d20254eA747Ae760B2045fFc29E8B')
+    const router = new web3.eth.Contract(Router.abi, '0x08A8cb0a0e84790baaFB91be71594B184e324301')
     this.setState({router})
 
     /*const arbitrator = new web3.eth.Contract(ArbitratorContract.abi,'0x91F95Fb01487490245502f0DA6CFaaAd0032B7dc')
@@ -343,7 +345,7 @@ class App extends Component {
 
     }*/
 
-    const ct = new web3.eth.Contract(ConditionalTokens.abi,'0x055fdA6703458E079e6bdd873e079bC7d67D2eC1')
+    const ct = new web3.eth.Contract(ConditionalTokens.abi,'0x3a95385961296036C7DAED3b2dC967582E48Cc47')
     this.setState({ct})
 
     let tokens = await ct.getPastEvents('TransferSingle', {fromBlock: 0, toBlock: 'latest'})
@@ -427,6 +429,20 @@ class App extends Component {
     this.addEventData(addr,responseJSON.title, responseJSON.description, responseJSON.question, responseJSON.rulingOptions.descriptions,endTime,resultTime,outcome,price,balances,state)
   }
 
+  async updatePrices(addr) {
+    var ev = new this.state.web3.eth.Contract(EventContract.abi, addr)
+    var numOptions = await ev.methods.numOfOutcomes().call()
+    var price = []
+    for (var j=0; j<numOptions; j++) {
+      price[j] = (await ev.methods.price(2**j,new this.state.web3.utils.BN('18446744073709551616')).call()/1000000).toFixed(2)
+    }
+    var index = this.state.eventData.map(function(o) {return o.address;}).indexOf(addr)
+    if(index>=0) {
+      let clone = [...this.state.eventData]
+      clone[index].price = price
+      this.setState({eventData: clone})
+    }
+  }
 
   listenForEvents = () => {
     if(this.state.loading == false) {
@@ -437,6 +453,10 @@ class App extends Component {
     })
     createeventemitter = this.state.factory.events.MarketCreated().on('data',(event,error) => {
       this.updateMarkets(event.returnValues._market)
+    })
+    createbetemitter = this.state.router.events.BetCreated().on('data',(event,error) => {
+      this.updatePrices(event.returnValues._event);
+      //console.log(event.returnValues)
     })
   }
     //contract.DisputeCreate({}).on('data', (event,error) => {})*/

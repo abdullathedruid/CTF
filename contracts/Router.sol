@@ -9,6 +9,8 @@ contract Router is IERC1155Receiver{
 
   address private currency;
 
+  event BetCreated(address indexed _event, uint _outcome, int128 _amount);
+
   constructor(address _curr) public {
     currency = _curr;
   }
@@ -17,6 +19,7 @@ contract Router is IERC1155Receiver{
     IERC20(currency).approve(_event,ABDKMath.mulu(_amount,10**18));
     int128 transfer = ISCMMaker(_event).buyshares(msg.sender,_outcome,_amount);
     require(IERC20(currency).transferFrom(msg.sender,address(this),ABDKMath.mulu(transfer,10**18)));
+    emit BetCreated(_event, _outcome, _amount);
   }
 
   /* function buyComboEvent(address[] memory _events, uint[] memory _outcomes, int128 _amount) public {
