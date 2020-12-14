@@ -32677,6 +32677,26 @@
     "version": "0.6.8+commit.0bbfe453.Emscripten.clang"
   },
   "networks": {
+    "42": {
+      "events": {
+        "0xb27af04ab132a0b6bba5de2a84bbbadcc31c20c33932936a992ae6ff951259c3": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "contract SCMMaker",
+              "name": "_market",
+              "type": "address"
+            }
+          ],
+          "name": "MarketCreated",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0x93Bec90AB76e2f2950201b763FD66D167eDCae54",
+      "transactionHash": "0xc54055d1675f690b8e4afcbae8df516fbe77c801a920a7df1825e0af54e38d25"
+    },
     "5777": {
       "events": {
         "0xb27af04ab132a0b6bba5de2a84bbbadcc31c20c33932936a992ae6ff951259c3": {
@@ -32699,7 +32719,7 @@
     }
   },
   "schemaVersion": "3.3.0",
-  "updatedAt": "2020-12-14T21:50:48.356Z",
+  "updatedAt": "2020-12-14T22:00:40.830Z",
   "networkType": "ethereum",
   "devdoc": {
     "methods": {}

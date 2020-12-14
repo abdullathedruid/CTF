@@ -318,10 +318,10 @@ class App extends Component {
 
     this.setState({web3})
 
-    const factory = new web3.eth.Contract(FactoryContract.abi, '0x2E1b6561494736Af332b807a94355965408BE382')
+    const factory = new web3.eth.Contract(FactoryContract.abi, '0x93Bec90AB76e2f2950201b763FD66D167eDCae54')
     this.setState({factory})
 
-    const currency = new web3.eth.Contract(FakeDai.abi, '0x71D1f893147646cE925CAeD841CB25f8e94249dD')
+    const currency = new web3.eth.Contract(FakeDai.abi, '0xdaD7A786c573263ee1D613578A05E8a8F179f5A3')
     this.setState({currency})
 
     const balance = await currency.methods.balanceOf(this.state.account).call()
@@ -330,7 +330,7 @@ class App extends Component {
     const numEvents = await factory.methods.getNumberOfMarkets().call()
     this.setState({numberOfEvents: numEvents})
 
-    const router = new web3.eth.Contract(Router.abi, '0x4978B9D7db08415ea4296689624b19DF720fCa79')
+    const router = new web3.eth.Contract(Router.abi, '0xBc9c135faaad1A496Ea670b38D2e4aE538Ad41Cb')
     this.setState({router})
 
     /*const arbitrator = new web3.eth.Contract(ArbitratorContract.abi,'0x91F95Fb01487490245502f0DA6CFaaAd0032B7dc')
@@ -345,7 +345,7 @@ class App extends Component {
 
     }*/
 
-    const ct = new web3.eth.Contract(ConditionalTokens.abi,'0x81b20eF8b6B7D7D789A75dDA9a50e538553A75Da')
+    const ct = new web3.eth.Contract(ConditionalTokens.abi,'0xa9a186470B32feF11F661376FA1CF4eaE113fC12')
     this.setState({ct})
 
     let tokens = await ct.getPastEvents('TransferSingle', {fromBlock: 0, toBlock: 'latest'})

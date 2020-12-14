@@ -575,7 +575,7 @@
   },
   "networks": {},
   "schemaVersion": "3.3.0",
-  "updatedAt": "2020-12-14T21:55:46.799Z",
+  "updatedAt": "2020-12-14T21:58:20.904Z",
   "devdoc": {
     "methods": {
       "rule(uint256,uint256)": {

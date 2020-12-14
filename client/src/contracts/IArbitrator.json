@@ -2328,7 +2328,7 @@
   },
   "networks": {},
   "schemaVersion": "3.3.0",
-  "updatedAt": "2020-12-14T21:55:46.817Z",
+  "updatedAt": "2020-12-14T21:58:20.914Z",
   "devdoc": {
     "methods": {
       "appeal(uint256,bytes)": {

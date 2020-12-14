@@ -4242,6 +4242,38 @@
     "version": "0.6.8+commit.0bbfe453.Emscripten.clang"
   },
   "networks": {
+    "42": {
+      "events": {
+        "0x1dccf5dbd95e50a70f1e01cd0ee1e4f84a5494d7c118641b01b3875589a9fdc9": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "_event",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "_outcome",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "int128",
+              "name": "_amount",
+              "type": "int128"
+            }
+          ],
+          "name": "BetCreated",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0xBc9c135faaad1A496Ea670b38D2e4aE538Ad41Cb",
+      "transactionHash": "0x7514739178521a2ebce2fa72ce9c4e789f2791ec78000391c15b00b3142bc56a"
+    },
     "5777": {
       "events": {
         "0x1dccf5dbd95e50a70f1e01cd0ee1e4f84a5494d7c118641b01b3875589a9fdc9": {
@@ -4276,7 +4308,7 @@
     }
   },
   "schemaVersion": "3.3.0",
-  "updatedAt": "2020-12-14T21:50:48.384Z",
+  "updatedAt": "2020-12-14T22:00:40.857Z",
   "networkType": "ethereum",
   "devdoc": {
     "methods": {}
