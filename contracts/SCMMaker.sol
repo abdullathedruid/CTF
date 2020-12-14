@@ -1,8 +1,9 @@
-pragma solidity ^0.7.0;
+pragma solidity ^0.6.0;
 
-import "https://github.com/kleros/erc-792/blob/master/contracts/IArbitrable.sol";
-import "https://github.com/kleros/erc-792/blob/master/contracts/IArbitrator.sol";
-import "https://github.com/kleros/erc-792/blob/master/contracts/erc-1497/IEvidence.sol";
+import "./interfaces/IArbitrable.sol";
+import "./interfaces/IArbitrator.sol";
+import "./interfaces/IEvidence.sol";
+import { ABDKMath } from "./ABDKMath64x64.sol";
 
 contract SCFactory {
 
@@ -65,26 +66,113 @@ contract SCMMaker is IArbitrable, IEvidence{
      * alpha is calculated as a constant that is used later on
      * need to add endtime, result time, and ipfs hash
      **/
-    constructor(address _owner, uint8 _numOptions, uint256 endTime, uint256 resultTime, string memory hash) {
+    constructor(address _owner, uint8 _numOptions, uint256 endTime, uint256 resultTime, string memory hash) public {
         numOfOutcomes = _numOptions;
-        int128 IL = ABDKMath64x64.fromUInt(initialLiq);
-        int128 n = ABDKMath64x64.fromUInt(_numOptions);
-        alpha = ABDKMath64x64.div(1,ABDKMath64x64.mul(10,ABDKMath64x64.mul(n,ABDKMath64x64.ln(n))));
-        b = ABDKMath64x64.mul(ABDKMath64x64.mul(IL,n),alpha);
+        int128 IL = ABDKMath.fromUInt(initialLiq);
+        int128 n = ABDKMath.fromUInt(_numOptions);
+        alpha = ABDKMath.div(1,ABDKMath.mul(10,ABDKMath.mul(n,ABDKMath.ln(n))));
+        b = ABDKMath.mul(ABDKMath.mul(IL,n),alpha);
         int128 sumtotal;
-        int128 eqb = ABDKMath64x64.exp(ABDKMath64x64.div(IL,b));
+        int128 eqb = ABDKMath.exp(ABDKMath.div(IL,b));
         game_master = _owner;
-        for(uint8 i=1;i<numOfOutcomes+1;i++) {
+        for(uint8 i=0;i<numOfOutcomes;i++) {
             q[i] = IL;
             //balances[i][msg.sender] = IL;
-            sumtotal = ABDKMath64x64.add(sumtotal,eqb);
-            total_balance = ABDKMath64x64.add(total_balance,IL);
+            sumtotal = ABDKMath.add(sumtotal,eqb);
+            total_balance = ABDKMath.add(total_balance,IL);
         }
-        current_cost = ABDKMath64x64.mul(b,ABDKMath64x64.ln(sumtotal));
+        current_cost = ABDKMath.mul(b,ABDKMath.ln(sumtotal));
         endTimestamp = endTime;
         resultTimestamp = resultTime;
         emit MetaEvidence(0,hash);
     }//"/ipfs/QmWcHMmZfMWkVHYSNNe6qrAhM5FiWQcjSad3hUseXEjCxA/metaEvidence.json"
+
+    /*
+      AMM functions
+    */
+
+    function cost() public view returns (int128) {  //Getter function, designed for the frontend
+        int128 sumtotal;
+        for(uint8 i=0; i<numOfOutcomes;i++) {
+            sumtotal = ABDKMath.add(sumtotal,ABDKMath.exp(ABDKMath.div(q[i],b)));
+        }
+        return ABDKMath.mul(b,ABDKMath.ln(sumtotal));
+    }
+
+    function costafterbuy(uint8 _outcome, int128 amount) public view returns (int128) { //Getter function, designed for front end
+        int128 sumtotal;
+        int128 _b = ABDKMath.mul(ABDKMath.add(total_balance,amount),alpha);
+        for(uint8 i=0; i<numOfOutcomes;i++) {
+            if(i!=_outcome) {
+                sumtotal = ABDKMath.add(sumtotal,
+                ABDKMath.exp(
+                    ABDKMath.div(q[i],
+                _b)
+                ));
+            } else {
+                sumtotal = ABDKMath.add(sumtotal,
+                ABDKMath.exp(
+                    ABDKMath.div(
+                        ABDKMath.add(q[_outcome],amount),
+                    _b))
+
+                );
+            }
+        }
+        return ABDKMath.mul(_b,ABDKMath.ln(sumtotal));
+    }
+
+    function price(uint8 _outcome, int128 amount) public view returns (uint256) { // Getter function, designed for the frontend
+       return ABDKMath.mulu(ABDKMath.sub(costafterbuy(_outcome,amount),cost()),1000000);
+    }
+
+    function buyshares(uint8 _outcome, int128 amount) public returns (int128 spot_price) {
+        require(status == Status.BettingOpen,'No more bets'); // There should be a check in the front-end to make sure that betting is open (also check endTimestamp), otherwise that would suck for you to spend gas
+        require(_outcome > 0, "Can't bet on option 0"); //disable option 0 for now
+        require(amount < total_balance,"Buying too many shares!"); //user will never get a good price for this bet, so save on some gas
+        if(block.timestamp > endTimestamp) { //If the user tries to place a bet but it's too late, then they can pay the gas to switch state
+            status = Status.NoMoreBets;
+        } else {
+            int128 new_cost;
+            int128 sumtotal;
+            total_balance = ABDKMath.add(total_balance,amount);
+            b = ABDKMath.mul(total_balance,alpha);
+            q[_outcome] = ABDKMath.add(q[_outcome],amount);
+            balances[_outcome][msg.sender] = ABDKMath.add(balances[_outcome][msg.sender],amount);
+            for(uint8 i=0; i<numOfOutcomes;i++) {
+                sumtotal = ABDKMath.add(sumtotal,
+                ABDKMath.exp(
+                    ABDKMath.div(q[i],
+                    b)
+                ));
+            }
+            new_cost = ABDKMath.mul(b,ABDKMath.ln(sumtotal));
+            spot_price = ABDKMath.sub(new_cost,current_cost);
+            //require(currency.transfer(this.address,ABDKMath.toUInt(spot_price*1000000000000000000)));
+            current_cost = new_cost;
+        }
+    }
+
+    function claimReward() public returns (uint256) {
+        require(block.timestamp > resultTimestamp,'Too early to claim');
+        require(status == Status.Resolved || (
+            status == Status.Appealable && block.timestamp > appealTimestamp),'Waiting for appeals');
+        int128 reward = balances[outcome][msg.sender];
+        q[outcome] = 0;   //TODO: this should be --
+        balances[outcome][msg.sender] = 0;
+        total_balance = ABDKMath.sub(total_balance,reward);
+        uint256 winnings = ABDKMath.mulu(reward,10**18);
+        //require(currency.transferFrom(this.address,msg.sender,winnings));
+        return(winnings);
+    }
+
+    function fu(uint256 x) public pure returns (int128) { //DEBUGGING FUNCTION - for convenience only
+        return ABDKMath.fromUInt(x);
+    }
+
+    function tu(int128 x) public pure returns (uint256) { //DEBUGGING FUNCTION - for convenience only
+        return ABDKMath.mulu(x,1000000);
+    }
 
     function getBalanceOf(uint8 _outcome, address _acc) public view returns (int128) {
         return balances[_outcome][_acc];
@@ -97,6 +185,10 @@ contract SCMMaker is IArbitrable, IEvidence{
     function totalShares() public view returns (int128) {
         return total_balance;
     }
+
+    /*
+      ORACLE FUNCTIONS
+    */
 
     function setOutcome(uint8 _outcome) public {
         require(status != Status.Disputed,"DECISION GONE TO KLEROS");
@@ -142,90 +234,4 @@ contract SCMMaker is IArbitrable, IEvidence{
     function getOutcome() public view returns (uint8) {
         return outcome;
     }
-
-    function cost() public view returns (int128) {  //Getter function, designed for the frontend
-        int128 sumtotal;
-        for(uint8 i=1; i<numOfOutcomes+1;i++) {
-            sumtotal = ABDKMath64x64.add(sumtotal,ABDKMath64x64.exp(ABDKMath64x64.div(q[i],b)));
-        }
-        return ABDKMath64x64.mul(b,ABDKMath64x64.ln(sumtotal));
-    }
-
-    function costafterbuy(uint8 _outcome, int128 amount) public view returns (int128) { //Getter function, designed for front end
-        int128 sumtotal;
-        int128 _b = ABDKMath64x64.mul(ABDKMath64x64.add(total_balance,amount),alpha);
-        for(uint8 i=1; i<numOfOutcomes+1;i++) {
-            if(i!=_outcome) {
-                sumtotal = ABDKMath64x64.add(sumtotal,
-                ABDKMath64x64.exp(
-                    ABDKMath64x64.div(q[i],
-                _b)
-                ));
-            } else {
-                sumtotal = ABDKMath64x64.add(sumtotal,
-                ABDKMath64x64.exp(
-                    ABDKMath64x64.div(
-                        ABDKMath64x64.add(q[_outcome],amount),
-                    _b))
-
-                );
-            }
-        }
-        return ABDKMath64x64.mul(_b,ABDKMath64x64.ln(sumtotal));
-    }
-
-    function price(uint8 _outcome, int128 amount) public view returns (uint256) { // Getter function, designed for the frontend
-       return ABDKMath64x64.mulu(ABDKMath64x64.sub(costafterbuy(_outcome,amount),cost()),1000000);
-    }
-
-    function buyshares(uint8 _outcome, int128 amount) public returns (int128 spot_price) {
-        require(status == Status.BettingOpen,'No more bets'); // There should be a check in the front-end to make sure that betting is open (also check endTimestamp), otherwise that would suck for you to spend gas
-        require(_outcome < numOfOutcomes+1,'Invalid option');
-        require(_outcome > 0, "Can't bet on option 0"); //disable option 0 for now
-        require(amount < total_balance,"Buying too many shares!"); //user will never get a good price for this bet, so save on some gas
-        if(block.timestamp > endTimestamp) { //If the user tries to place a bet but it's too late, then they can pay the gas to switch state
-            status = Status.NoMoreBets;
-        } else {
-            int128 new_cost;
-            int128 sumtotal;
-            total_balance = ABDKMath64x64.add(total_balance,amount);
-            b = ABDKMath64x64.mul(total_balance,alpha);
-            q[_outcome] = ABDKMath64x64.add(q[_outcome],amount);
-            balances[_outcome][msg.sender] = ABDKMath64x64.add(balances[_outcome][msg.sender],amount);
-            for(uint8 i=1; i<numOfOutcomes+1;i++) {
-                sumtotal = ABDKMath64x64.add(sumtotal,
-                ABDKMath64x64.exp(
-                    ABDKMath64x64.div(q[i],
-                    b)
-                ));
-            }
-            new_cost = ABDKMath64x64.mul(b,ABDKMath64x64.ln(sumtotal));
-            spot_price = ABDKMath64x64.sub(new_cost,current_cost);
-            //require(currency.transfer(this.address,ABDKMath64x64.toUInt(spot_price*1000000000000000000)));
-            current_cost = new_cost;
-        }
-    }
-
-    function claimReward() public returns (uint256) {
-        require(block.timestamp > resultTimestamp,'Too early to claim');
-        require(status == Status.Resolved || (
-            status == Status.Appealable && block.timestamp > appealTimestamp),'Waiting for appeals');
-        int128 reward = balances[outcome][msg.sender];
-        q[outcome] = 0;
-        balances[outcome][msg.sender] = 0;
-        total_balance = ABDKMath64x64.sub(total_balance,reward);
-        uint256 winnings = ABDKMath64x64.mulu(reward,10**18);
-        //require(currency.transferFrom(this.address,msg.sender,winnings));
-        return(winnings);
-    }
-
-    function fu(uint256 x) public pure returns (int128) { //DEBUGGING FUNCTION - for convenience only
-        return ABDKMath64x64.fromUInt(x);
-    }
-
-    function tu(int128 x) public pure returns (uint256) { //DEBUGGING FUNCTION - for convenience only
-        return ABDKMath64x64.toUInt(x*1000000);
-    }
-
-
 }

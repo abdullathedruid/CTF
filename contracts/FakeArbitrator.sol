@@ -6,9 +6,9 @@
  * @deployments: []
  * SPDX-License-Identifier: MIT
  */
-pragma solidity >=0.7;
+pragma solidity >=0.6;
 
-import "https://github.com/kleros/erc-792/blob/master/contracts/IArbitrator.sol";
+import "./interfaces/IArbitrator.sol";
 
 contract SimpleCentralizedArbitrator is IArbitrator {
     address public owner = msg.sender;
@@ -22,11 +22,11 @@ contract SimpleCentralizedArbitrator is IArbitrator {
 
     Dispute[] public disputes;
 
-    function arbitrationCost(bytes memory _extraData) public override pure returns (uint256) {
+    function arbitrationCost(bytes memory _extraData) public override view returns (uint256) {
         return 0.001 ether;
     }
 
-    function appealCost(uint256 _disputeID, bytes memory _extraData) public override pure returns (uint256) {
+    function appealCost(uint256 _disputeID, bytes memory _extraData) public override view returns (uint256) {
         return 2**250; // An unaffordable amount which practically avoids appeals.
     }
 
@@ -85,7 +85,7 @@ contract SimpleCentralizedArbitrator is IArbitrator {
         require(msg.value >= appealCost(_disputeID, _extraData), "Not enough ETH to cover arbitration costs.");
     }
 
-    function appealPeriod(uint256 _disputeID) public override pure returns (uint256 start, uint256 end) {
+    function appealPeriod(uint256 _disputeID) public override view returns (uint256 start, uint256 end) {
         return (0, 0);
     }
 }

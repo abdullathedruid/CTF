@@ -13,7 +13,7 @@ pragma solidity ^0.5.0 || ^0.6.0 || ^0.7.0;
  * need to store it, thus in Solidity signed 64.64-bit fixed point numbers are
  * represented by int128 type holding only the numerator.
  */
-library ABDKMath64x64 {
+library ABDKMath {
   /*
    * Minimum value signed 64.64-bit fixed point number may have.
    */
