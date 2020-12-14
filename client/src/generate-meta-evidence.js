@@ -1,4 +1,4 @@
-export default (title,category,description,question,options,optionsDesc,payer) => ({
+export default (title,category,description,question,options,payer) => ({
   category: category,
   title: title,
   description: description,
@@ -6,7 +6,7 @@ export default (title,category,description,question,options,optionsDesc,payer) =
   rulingOptions: {
     type: 'single-select',
     titles: options,
-    descriptions: optionsDesc
+    descriptions: options
   },
   aliases: {
     [payer]: 'Market Maker'

@@ -90,7 +90,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -103,7 +104,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -122,7 +124,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -146,7 +149,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -170,7 +174,8 @@
         }
       ],
       "stateMutability": "payable",
-      "type": "function"
+      "type": "function",
+      "payable": true
     },
     {
       "inputs": [],
@@ -183,7 +188,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -202,7 +208,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -221,7 +228,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -255,7 +263,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -291,7 +300,8 @@
       "name": "appeal",
       "outputs": [],
       "stateMutability": "payable",
-      "type": "function"
+      "type": "function",
+      "payable": true
     },
     {
       "inputs": [
@@ -315,7 +325,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     }
   ],
   "metadata": "{\"compiler\":{\"version\":\"0.6.8+commit.0bbfe453\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"_disputeID\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"contract IArbitrable\",\"name\":\"_arbitrable\",\"type\":\"address\"}],\"name\":\"AppealDecision\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"_disputeID\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"contract IArbitrable\",\"name\":\"_arbitrable\",\"type\":\"address\"}],\"name\":\"AppealPossible\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"_disputeID\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"contract IArbitrable\",\"name\":\"_arbitrable\",\"type\":\"address\"}],\"name\":\"DisputeCreation\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_disputeID\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"_extraData\",\"type\":\"bytes\"}],\"name\":\"appeal\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_disputeID\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"_extraData\",\"type\":\"bytes\"}],\"name\":\"appealCost\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_disputeID\",\"type\":\"uint256\"}],\"name\":\"appealPeriod\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"start\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"end\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"_extraData\",\"type\":\"bytes\"}],\"name\":\"arbitrationCost\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_choices\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"_extraData\",\"type\":\"bytes\"}],\"name\":\"createDispute\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"disputeID\",\"type\":\"uint256\"}],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_disputeID\",\"type\":\"uint256\"}],\"name\":\"currentRuling\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"ruling\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_disputeID\",\"type\":\"uint256\"}],\"name\":\"disputeStatus\",\"outputs\":[{\"internalType\":\"enum IArbitrator.DisputeStatus\",\"name\":\"status\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"disputes\",\"outputs\":[{\"internalType\":\"contract IArbitrable\",\"name\":\"arbitrated\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"choices\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"ruling\",\"type\":\"uint256\"},{\"internalType\":\"enum IArbitrator.DisputeStatus\",\"name\":\"status\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_disputeID\",\"type\":\"uint256\"}],\"name\":\"getDisputeData\",\"outputs\":[{\"internalType\":\"contract IArbitrable\",\"name\":\"\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"enum IArbitrator.DisputeStatus\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getNumberOfDisputes\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_disputeID\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_ruling\",\"type\":\"uint256\"}],\"name\":\"rule\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/C/Users/Abdulla/apps/CTF/contracts/FakeArbitrator.sol\":\"SimpleCentralizedArbitrator\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/C/Users/Abdulla/apps/CTF/contracts/FakeArbitrator.sol\":{\"keccak256\":\"0x9629bde18b6511d437c65196729b12786c87723c0eec9db18cadd1319674072a\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://c32705f9fd881485015bcbd020fe490495d8609f77eb1dbfb473afd05d69d42a\",\"dweb:/ipfs/QmSau2WMoSYCGZXMn5nq5ybsEd1S6HF78j6LgKKPDQ9pxw\"]},\"/C/Users/Abdulla/apps/CTF/contracts/interfaces/IArbitrable.sol\":{\"keccak256\":\"0xc8c9345c2927044123263a9f6c8b6f6e7ba4f3a75098f61ecff93135fe7d3f5e\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://81c7b1a3e498adf1e6cddacd1f329740b9ba1599668709c7c1ae2464eeeefe6e\",\"dweb:/ipfs/QmW3aqr7atC9QRJufWDWf9MCqEDiW9MxTXgtpw4PeVC4UA\"]},\"/C/Users/Abdulla/apps/CTF/contracts/interfaces/IArbitrator.sol\":{\"keccak256\":\"0x8e4b5dea3617cf27bc32e6850ad80a86834d9563690881aa71837ac785066f1c\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://a20a35420cc9c7540f2d84299f08c5b106007af6c9b464d9c3bbaf08e23f93fd\",\"dweb:/ipfs/QmPR7uYB7N3CzrtL1J8WW1SRX9RFAJUUv138qnFRorKDtr\"]}},\"version\":1}",
@@ -7592,9 +7603,75 @@
     "name": "solc",
     "version": "0.6.8+commit.0bbfe453.Emscripten.clang"
   },
-  "networks": {},
+  "networks": {
+    "5777": {
+      "events": {
+        "0x9c9b64db9e130f48381bf697abf638e73117dbfbfd7a4484f2da3ba188f4187d": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "_disputeID",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "contract IArbitrable",
+              "name": "_arbitrable",
+              "type": "address"
+            }
+          ],
+          "name": "AppealDecision",
+          "type": "event"
+        },
+        "0xa5d41b970d849372be1da1481ffd78d162bfe57a7aa2fe4e5fb73481fa5ac24f": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "_disputeID",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "contract IArbitrable",
+              "name": "_arbitrable",
+              "type": "address"
+            }
+          ],
+          "name": "AppealPossible",
+          "type": "event"
+        },
+        "0x141dfc18aa6a56fc816f44f0e9e2f1ebc92b15ab167770e17db5b084c10ed995": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "_disputeID",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "contract IArbitrable",
+              "name": "_arbitrable",
+              "type": "address"
+            }
+          ],
+          "name": "DisputeCreation",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0xd49FF467D906D120b1DCcA9234eEF5f4CBa4DcA0",
+      "transactionHash": "0x554e78085024fe984155045bab0833933b039d5de1f5be44b30c525e2e3a9728"
+    }
+  },
   "schemaVersion": "3.3.0",
-  "updatedAt": "2020-12-14T10:34:04.072Z",
+  "updatedAt": "2020-12-14T10:59:48.024Z",
+  "networkType": "ethereum",
   "devdoc": {
     "methods": {}
   },

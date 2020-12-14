@@ -66,20 +66,14 @@ class CreateMarket extends Component {
     this.setState({options})
   }
 
-  handleChangeOptionDesc = (e) => {
-    let optionsDesc = this.state.optionsDesc
-    optionsDesc[e.target.id.substring(1)] = e.target.value
-    this.setState({optionsDesc})
-  }
-
   handleChangeEndTime = (event) => {
     this.setState({endTime: event.target.value})
   }
 
   handleSubmit = (e) => {
-    let metaevidence = generateMetaEvidence(this.state.title,this.state.category,this.state.description,this.state.question,this.state.options,this.state.options,'0xHI')
+    let metaevidence = generateMetaEvidence(this.state.title,this.state.category,this.state.description,this.state.question,this.state.options,this.props.state.account)
 
-    this.props.createMarket(metaevidence,this.state.number,this.state.endTime,this.state.resultTime);
+    this.props.createMarket(metaevidence,this.state.number,this.state.endTime,this.state.endTime);
   }
 
   render() {

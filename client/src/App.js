@@ -18,6 +18,9 @@ const ipfs = require("nano-ipfs-store").at("https://ipfs.infura.io:5001");
 
 const enc = new TextEncoder()
 
+let depositemitter = ""
+let createeventemitter = ""
+
 class App extends Component {
 
   constructor() {
@@ -83,6 +86,11 @@ class App extends Component {
     await this.loadWeb3()
     await this.loadData()
     this.listenForEvents()
+  }
+
+  componentWillUnmount() {
+    depositemitter.removeAllListeners('data')
+    createeventemitter.removeAllListeners('data')
   }
 
   async loadWeb3() {
@@ -216,10 +224,10 @@ class App extends Component {
 
     this.setState({web3})
 
-    const factory = new web3.eth.Contract(FactoryContract.abi, '0xCC484690bfeA257DD50f7a6865D0793d16Ac3E2A')
+    const factory = new web3.eth.Contract(FactoryContract.abi, '0x31F96B9f6FC7b16F9d82485904B6a50FcFB63225')
     this.setState({factory})
 
-    const currency = new web3.eth.Contract(FakeDai.abi, '0xD68B69809EE1141d424cFcB1BE66c67f13E2EC06')
+    const currency = new web3.eth.Contract(FakeDai.abi, '0xF87B777E5E7E36E83BFcaBfa1c11547EAb2406f5')
     this.setState({currency})
 
     const balance = await currency.methods.balanceOf(this.state.account).call()
@@ -227,7 +235,7 @@ class App extends Component {
 
     const numEvents = await factory.methods.getNumberOfMarkets().call()
     this.setState({numberOfEvents: numEvents})
-    const arbitrator = new web3.eth.Contract(ArbitratorContract.abi,'0xaededC9A349B19508cdAeD4C6F8CF244413260E7')
+    const arbitrator = new web3.eth.Contract(ArbitratorContract.abi,'0xd49FF467D906D120b1DCcA9234eEF5f4CBa4DcA0')
     this.setState({arbitrator})
 
     const numArbs = await arbitrator.methods.getNumberOfDisputes().call()
@@ -236,7 +244,6 @@ class App extends Component {
       .then((response) => {
         this.addDisputeData(response)
       })
-
 
     }
 
@@ -249,8 +256,7 @@ class App extends Component {
       var price = []
       var balances = []
       for (var j=0; j<numOptions; j++) {
-        price[j] = (await ev.methods.price(j+1,new web3.utils.BN('18446744073709551616')).call()/1000000).toFixed(2)
-        balances[j] = (await ev.methods.getBalanceOf(j+1,this.state.account).call())/(2**64)
+        price[j] = (await ev.methods.price(j,new web3.utils.BN('18446744073709551616')).call()/1000000).toFixed(2)
       }
 
       var outcome = await ev.methods.getOutcome().call()
@@ -276,6 +282,11 @@ class App extends Component {
         })
       })
     }
+
+    if(numEvents==0) {
+      this.setState({loading: false})
+    }
+
   }
 
   async updateBalance() {
@@ -283,14 +294,48 @@ class App extends Component {
     this.setState({balance})
   }
 
+  async updateMarkets(addr) {
+    var ev = new this.state.web3.eth.Contract(EventContract.abi, addr)
+    this.setState({event: [...this.state.event,ev]})
+
+    var numOptions = await ev.methods.numOfOutcomes().call()
+    var price = []
+    var balances = []
+    for (var j=0; j<numOptions; j++) {
+      price[j] = (await ev.methods.price(j,new this.state.web3.utils.BN('18446744073709551616')).call()/1000000).toFixed(2)
+    }
+
+    var outcome = await ev.methods.getOutcome().call()
+    var endTime = await ev.methods.endTimestamp().call()
+    var resultTime = await ev.methods.resultTimestamp().call()
+
+    var state = await ev.methods.status().call()
+
+    var metaevidence
+    await ev.getPastEvents('MetaEvidence', {fromBlock: 0, toBlock: 'latest'})
+    .then((evx) => {
+      metaevidence = evx[0].returnValues._evidence;
+      console.log('Loading file: ',metaevidence)
+      var output = fetch('https://gateway.ipfs.io'+metaevidence)
+      .then((response) => response.json())
+      .then((responseJSON) => {
+        this.addEventData(ev._address,responseJSON.title, responseJSON.description, responseJSON.question, responseJSON.rulingOptions.descriptions,endTime,resultTime,outcome,price,balances,state)
+        this.setState({numberOfEvents: this.state.numberofEvents+1})
+        console.log('Finished loading: ',metaevidence);
+      })
+    })
+  }
+
 
   listenForEvents = () => {
     if(this.state.loading == false) {
-    //console.log('address',this.state.event[0].events)
-    this.state.currency.events.Transfer().on('data',(event,error) => {
+    depositemitter = this.state.currency.events.Transfer().on('data',(event,error) => {
       if(event.returnValues.to==this.state.account) {
         this.updateBalance()
       }
+    })
+    createeventemitter = this.state.factory.events.MarketCreated().on('data',(event,error) => {
+      this.updateMarkets(event.returnValues._market)
     })
   }
     //contract.DisputeCreate({}).on('data', (event,error) => {})*/

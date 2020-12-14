@@ -22,7 +22,7 @@ function returnFormattedTime(unix) {
   var hours = date.getHours()
   var mins = (date.getMinutes()<10?'0'+date.getMinutes():date.getMinutes())
   var secs = (date.getSeconds()<10?'0'+date.getSeconds():date.getSeconds())
-  return day+" "+month+" "+year+" "+hours+":"+mins+":"+secs+" (UTC)"
+  return day+" "+month+" "+year+" "+hours+":"+mins+":"+secs
 }
 
 
@@ -94,14 +94,13 @@ class BetCard extends Component {
       {
         eventData.options.map((option,key) => {
           return(
-            <ListItem button id={key} onClick={this.handleOpen}>{eventData.options[key]}: {eventData.price[key]}   [{eventData.balances[key]} shares owned]</ListItem>
+            <ListItem button id={key} onClick={this.handleOpen}>{eventData.options[key]}: {eventData.price[key]} </ListItem>
           )
         })
       }
       </List>
       {this.renderOutcome(eventData.resultTime,eventData.outcome)}
       <Typography>Betting finishes: {returnFormattedTime(eventData.endTime)}</Typography>
-      <Typography>Answer revealed: {returnFormattedTime(eventData.resultTime)}</Typography>
       <List>
       {this.renderSetOutcome(eventData.resultTime,this.props.id)}
       {this.renderDisputeAnswer(eventData.resultTime,this.props.id)}
@@ -121,7 +120,7 @@ class Bets extends Component {
   }
 
   handleSetOutcome = (e) => {
-    this.props.handleSetOutcome(e,parseInt(e.target.id)+1)
+    this.props.handleSetOutcome(e,parseInt(e.target.id))
   }
 
   handleSubmit = (e) => {
@@ -129,56 +128,65 @@ class Bets extends Component {
   }
 
   render() {
-    console.log(this.props.state.quotedPrice)
-    return(
-      <Container>
-      <Dialog scroll='body' onClose={this.handleClose} open={this.props.open}>
-      <img style={{ width: "100%"}} src="place_bets.png" alt= "place bets"/>
-        <Typography>{this.props.state.eventData[this.props.state.openBetBet].title}</Typography>
-        <Typography>You have chosen: {this.props.state.eventData[this.props.state.openBetBet].options[this.props.state.openBetOption-1]}</Typography>
-        <form>
-          <TextField fullWidth label="How many shares to buy?" onChange={this.props.handleChangePurchaseSize}/>
-          <TextField fullWidth label="Price" value={this.props.state.quotedPrice} />
-          <div style={{
-            margin: 'auto',
-          width: '50%',
-          padding: 10
-          }}>
-          <Button center="true" align = "center" colour="primary" type="submit" size="large" style = {{backgroundColor: "#ED1C24", color : "#FFFFFF"}}  variant="contained" component="span" onClick={this.handleSubmit}> Submit</Button>
-          </div>
-        </form>
+    if(this.props.state.eventData.length==0) {
+      return(
+        <Container>
+          <img style={{ width: "100%"}} src="active_markets.png" />
+          <CardMedia style={{ height: "200px" }} image="/market2.jpg" />
+          <div> No events </div>
+        </Container>
+      )
+    } else {
+      return(
+        <Container>
+        <Dialog scroll='body' onClose={this.handleClose} open={this.props.open}>
+        <img style={{ width: "100%"}} src="place_bets.png" alt= "place bets"/>
+          <Typography>{this.props.state.eventData[this.props.state.openBetBet].title}</Typography>
+          <Typography>You have chosen: {this.props.state.eventData[this.props.state.openBetBet].options[this.props.state.openBetOption-1]}</Typography>
+          <form>
+            <TextField fullWidth label="How many shares to buy?" onChange={this.props.handleChangePurchaseSize}/>
+            <TextField fullWidth label="Price" value={this.props.state.quotedPrice} />
+            <div style={{
+              margin: 'auto',
+            width: '50%',
+            padding: 10
+            }}>
+            <Button center="true" align = "center" colour="primary" type="submit" size="large" style = {{backgroundColor: "#ED1C24", color : "#FFFFFF"}}  variant="contained" component="span" onClick={this.handleSubmit}> Submit</Button>
+            </div>
+          </form>
 
-      </Dialog>
-      <Dialog open={this.props.openSetOutcome} onClose={this.props.handleCloseSetOutcome} scroll='body'>
-      <img style={{ width: "100%"}} src="set_outcome.png" alt= "set outcome"/>
-      <Typography>{this.props.state.eventData[this.props.state.openSetOutcomeBet].title}</Typography>
-      <Typography>{this.props.state.eventData[this.props.state.openSetOutcomeBet].description}</Typography>
-      <List>
-      {
-        this.props.state.eventData[this.props.state.openSetOutcomeBet].options.map((option,key) => {
-          return(
-            <ListItem button id={key} onClick={this.handleSetOutcome}>{option}</ListItem>
-          )
-        })
-      }
-      </List>
-      </Dialog>
-      <img style={{ width: "100%"}} src="active_markets.png" />
-      <CardMedia style={{ height: "200px" }} image="/market2.jpg" />
-      <div>
-      {
-        this.props.state.eventData.map((bet,key) => {
-          return(
-            <Accordion>
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}> {this.props.state.eventData[key].title} </AccordionSummary>
-              <AccordionDetails> <BetCard id={key} state={this.props.state} handleDispute={this.props.handleDispute} handleOpenSetOutcome={this.props.handleOpenSetOutcome} handleOpen={this.props.handleOpen} /> </AccordionDetails>
-            </Accordion>
-          )
-        })
-      }
-      </div>
-      </Container>
-    )
+        </Dialog>
+        <Dialog open={this.props.openSetOutcome} onClose={this.props.handleCloseSetOutcome} scroll='body'>
+        <img style={{ width: "100%"}} src="set_outcome.png" alt= "set outcome"/>
+        <Typography>{this.props.state.eventData[this.props.state.openSetOutcomeBet].title}</Typography>
+        <Typography>{this.props.state.eventData[this.props.state.openSetOutcomeBet].description}</Typography>
+        <List>
+        {
+          this.props.state.eventData[this.props.state.openSetOutcomeBet].options.map((option,key) => {
+            return(
+              <ListItem button id={key} onClick={this.handleSetOutcome}>{option}</ListItem>
+            )
+          })
+        }
+        </List>
+        </Dialog>
+        <img style={{ width: "100%"}} src="active_markets.png" />
+        <CardMedia style={{ height: "200px" }} image="/market2.jpg" />
+        <div>
+        {
+          this.props.state.eventData.map((bet,key) => {
+            return(
+              <Accordion>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}> {this.props.state.eventData[key].title} </AccordionSummary>
+                <AccordionDetails> <BetCard id={key} state={this.props.state} handleDispute={this.props.handleDispute} handleOpenSetOutcome={this.props.handleOpenSetOutcome} handleOpen={this.props.handleOpen} /> </AccordionDetails>
+              </Accordion>
+            )
+          })
+        }
+        </div>
+        </Container>
+      )
+    }
   }
 }
 
