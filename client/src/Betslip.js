@@ -5,7 +5,8 @@ import AccordionDetails from '@material-ui/core/AccordionDetails';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Container from '@material-ui/core/Container'
 import Typography from '@material-ui/core/Typography'
-import Button from '@material-ui/core/Button'
+import Button from '@material-ui/core/Button';
+import ButtonGroup from '@material-ui/core/ButtonGroup';
 import {List, ListItem,CardMedia} from '@material-ui/core'
 import {PropTypes} from 'react'
 import CancelIcon from '@material-ui/icons/Cancel';
@@ -20,6 +21,25 @@ class Betslip extends Component {
     if(e.target.id == "") {} else {
       this.props.handleRemoveBet(e.target.id)
     }
+  }
+
+  containedIfIndex = (a,k,b) => {
+    if((a & (1<<k)) == 0) {
+      return "outlined"
+    } else {
+      return "contained"
+    }
+  }
+
+  alterBet = (e,k,key) => {
+    this.props.alterBet(key,k)
+  }
+
+  calcPrice = (e) => {
+    var i=0;
+    this.props.state.betslip.map((bet,key) => {
+    })
+    return e + ' USD'
   }
 
   render() {
@@ -43,20 +63,30 @@ class Betslip extends Component {
         {this.props.state.betslip.map((bet, key)=> {
           return(
             <ListItem>
-              <div>
+              <Container>
               <IconButton color="primary" aria-label="upload picture" component="span" id={key} onClick={this.handleRemoveBet}>
                 <CancelIcon id={key}/>
               </IconButton>
               {this.props.state.eventData[this.props.state.eventData.map(function(o) {return o.address;}).indexOf(bet.event)].title}
+              <div>
+                <ButtonGroup color="primary" >
+                {this.props.state.eventData[this.props.state.eventData.map(function(o) {return o.address;}).indexOf(bet.event)].price.map((p,k) => {
+                  return(
+                    <Button onClick={e => this.alterBet(e,k,key)}
+                    variant={this.containedIfIndex(bet.outcome,k,this.props.state.eventData[this.props.state.eventData.map(function(o) {return o.address;}).indexOf(bet.event)].price.length)}> {this.props.state.eventData[this.props.state.eventData.map(function(o) {return o.address;}).indexOf(bet.event)].options[k]}:${p} </Button>
+                  )
+                })}
+                </ButtonGroup>
               </div>
+              </Container>
             </ListItem>
           )
         })}
         </List>
         </div>
-        Submit single bet
         <div>
         COMBO BET
+        Your combo bet that returns $100 will cost {this.calcPrice(100)}
         </div>
 
         </Container>

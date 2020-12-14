@@ -181,13 +181,28 @@ class App extends Component {
   }
 
   handleOpenBet = (e,b,o) => {
-    if(this.state.betslip.map(function(o) {return o.event; }).indexOf(this.state.eventData[b].address) < 0) {
+    var i = this.state.betslip.map(function(o) {return o.event; }).indexOf(this.state.eventData[b].address)
+    if(i < 0) {
       var obj = {
         event: this.state.eventData[b].address,
-        outcome: o
+        outcome: 2**(o)
       }
       this.setState({betslip: [...this.state.betslip, obj]})
+    } else {
+      var newobj = this.state.betslip
+      newobj[i].outcome = 2**o
+      this.setState({betslip: newobj})
     }
+  }
+
+  alterBet = (key,val) => {
+    var newobj = this.state.betslip
+    if((newobj[key].outcome & (1<<val)) == 0) {
+      newobj[key].outcome += 2**val
+    } else {
+      newobj[key].outcome -= 2**val
+    }
+    this.setState({betslip: newobj})
   }
 
   addEventData (address,title,description,question,options,endTime,resultTime, outcome, price, balances, state) {
@@ -376,7 +391,7 @@ class App extends Component {
         <Bets handleDispute={this.handleDispute} handleSetOutcome = {this.handleSetOutcome} handleOpenSetOutcome={this.handleOpenSetOutcome} handleCloseSetOutcome={this.handleCloseSetOutcome} handlePlaceBet={this.handlePlaceBet} handleChangePurchaseSize={this.handleChangePurchaseSize} state={this.state} openSetOutcome={this.state.openSetOutcome} open={this.state.openBet} handleClose={this.handleCloseBet} handleOpen={this.handleOpenBet}/>
       </Grid>
       <Grid item xs={4}>
-        <Betslip handleRemoveBet={this.handleRemoveBet} handleDisputeOutcome={this.handleDisputeOutcome} state={this.state}/>
+        <Betslip alterBet={this.alterBet} handleRemoveBet={this.handleRemoveBet} handleDisputeOutcome={this.handleDisputeOutcome} state={this.state}/>
       </Grid>
     </Grid>
     </main>
