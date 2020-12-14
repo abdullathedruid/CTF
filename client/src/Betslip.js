@@ -43,7 +43,13 @@ class Betslip extends Component {
         <img style={{ width: "100%"}} src="dispute_outcome.png" />
         <CardMedia style={{ height: "200px" }} image="/court.png" />
         <div>
-          No bets in betslip
+          {this.props.state.positions.map((bet,key) => {
+            return(
+              <div>
+              ID {bet.id}: {bet.amount}
+              </div>
+            )
+          })}
         </div>
         </Container>
       )
@@ -122,7 +128,6 @@ class Betslip extends Component {
           <TextField label="Price" fullWidth value={this.props.state.quotedPrice}></TextField>
           <Button colour="primary" type="submit" size="large" style = {{backgroundColor: "#ED1C24", color : "#FFFFFF"}}  variant="contained" component="span" > Submit {"C-".repeat(this.props.state.betslip.length-1)}COMBO bet </Button>
         </div>
-
         </Container>
       )
     }

@@ -1,0 +1,427 @@
+{
+  "contractName": "ISCMMaker",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_user",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_outcome",
+          "type": "uint256"
+        },
+        {
+          "internalType": "int128",
+          "name": "amount",
+          "type": "int128"
+        }
+      ],
+      "name": "buyshares",
+      "outputs": [
+        {
+          "internalType": "int128",
+          "name": "spot_price",
+          "type": "int128"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.6.8+commit.0bbfe453\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_user\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_outcome\",\"type\":\"uint256\"},{\"internalType\":\"int128\",\"name\":\"amount\",\"type\":\"int128\"}],\"name\":\"buyshares\",\"outputs\":[{\"internalType\":\"int128\",\"name\":\"spot_price\",\"type\":\"int128\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/C/Users/Abdulla/apps/CTF/contracts/interfaces/ISCMMaker.sol\":\"ISCMMaker\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/C/Users/Abdulla/apps/CTF/contracts/interfaces/ISCMMaker.sol\":{\"keccak256\":\"0x37d14b04114a4fcb5a607826023e9def2508ce2a639ec028622c41cdf05ebccb\",\"urls\":[\"bzz-raw://a0852b2cc50afc6d44a0e6b6e4f0894f4f59e60730bdeb353e667a68df35e4ef\",\"dweb:/ipfs/QmWmGdy4C8tiwHuDQsU9jppeYWTAfqiqJ5m6SUkW3xLECs\"]}},\"version\":1}",
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "immutableReferences": {},
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "pragma solidity >=0.6;\r\n\r\ninterface ISCMMaker {\r\n  function buyshares(address _user, uint _outcome, int128 amount) external returns (int128 spot_price);\r\n}\r\n",
+  "sourcePath": "C:\\Users\\Abdulla\\apps\\CTF\\contracts\\interfaces\\ISCMMaker.sol",
+  "ast": {
+    "absolutePath": "/C/Users/Abdulla/apps/CTF/contracts/interfaces/ISCMMaker.sol",
+    "exportedSymbols": {
+      "ISCMMaker": [
+        5933
+      ]
+    },
+    "id": 5934,
+    "license": null,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 5921,
+        "literals": [
+          "solidity",
+          ">=",
+          "0.6"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:22:11"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": null,
+        "fullyImplemented": false,
+        "id": 5933,
+        "linearizedBaseContracts": [
+          5933
+        ],
+        "name": "ISCMMaker",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": null,
+            "documentation": null,
+            "functionSelector": "7249f3e4",
+            "id": 5932,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "buyshares",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 5928,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 5923,
+                  "mutability": "mutable",
+                  "name": "_user",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 5932,
+                  "src": "70:13:11",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 5922,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "70:7:11",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 5925,
+                  "mutability": "mutable",
+                  "name": "_outcome",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 5932,
+                  "src": "85:13:11",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 5924,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "85:4:11",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 5927,
+                  "mutability": "mutable",
+                  "name": "amount",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 5932,
+                  "src": "100:13:11",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_int128",
+                    "typeString": "int128"
+                  },
+                  "typeName": {
+                    "id": 5926,
+                    "name": "int128",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "100:6:11",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_int128",
+                      "typeString": "int128"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "69:45:11"
+            },
+            "returnParameters": {
+              "id": 5931,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 5930,
+                  "mutability": "mutable",
+                  "name": "spot_price",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 5932,
+                  "src": "133:17:11",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_int128",
+                    "typeString": "int128"
+                  },
+                  "typeName": {
+                    "id": 5929,
+                    "name": "int128",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "133:6:11",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_int128",
+                      "typeString": "int128"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "132:19:11"
+            },
+            "scope": 5933,
+            "src": "51:101:11",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 5934,
+        "src": "26:129:11"
+      }
+    ],
+    "src": "0:157:11"
+  },
+  "legacyAST": {
+    "absolutePath": "/C/Users/Abdulla/apps/CTF/contracts/interfaces/ISCMMaker.sol",
+    "exportedSymbols": {
+      "ISCMMaker": [
+        5933
+      ]
+    },
+    "id": 5934,
+    "license": null,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 5921,
+        "literals": [
+          "solidity",
+          ">=",
+          "0.6"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:22:11"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": null,
+        "fullyImplemented": false,
+        "id": 5933,
+        "linearizedBaseContracts": [
+          5933
+        ],
+        "name": "ISCMMaker",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": null,
+            "documentation": null,
+            "functionSelector": "7249f3e4",
+            "id": 5932,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "buyshares",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 5928,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 5923,
+                  "mutability": "mutable",
+                  "name": "_user",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 5932,
+                  "src": "70:13:11",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 5922,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "70:7:11",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 5925,
+                  "mutability": "mutable",
+                  "name": "_outcome",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 5932,
+                  "src": "85:13:11",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 5924,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "85:4:11",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 5927,
+                  "mutability": "mutable",
+                  "name": "amount",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 5932,
+                  "src": "100:13:11",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_int128",
+                    "typeString": "int128"
+                  },
+                  "typeName": {
+                    "id": 5926,
+                    "name": "int128",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "100:6:11",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_int128",
+                      "typeString": "int128"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "69:45:11"
+            },
+            "returnParameters": {
+              "id": 5931,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 5930,
+                  "mutability": "mutable",
+                  "name": "spot_price",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 5932,
+                  "src": "133:17:11",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_int128",
+                    "typeString": "int128"
+                  },
+                  "typeName": {
+                    "id": 5929,
+                    "name": "int128",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "133:6:11",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_int128",
+                      "typeString": "int128"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "132:19:11"
+            },
+            "scope": 5933,
+            "src": "51:101:11",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 5934,
+        "src": "26:129:11"
+      }
+    ],
+    "src": "0:157:11"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.6.8+commit.0bbfe453.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.3.0",
+  "updatedAt": "2020-12-14T20:52:00.406Z",
+  "devdoc": {
+    "methods": {}
+  },
+  "userdoc": {
+    "methods": {}
+  }
+}

@@ -13,6 +13,8 @@ import EventContract from './contracts/SCMMaker.json'
 import ArbitratorContract from './contracts/SimpleCentralizedArbitrator.json'
 import FactoryContract from './contracts/SCFactory.json'
 import FakeDai from './contracts/FakeDai.json'
+import Router from './contracts/Router.json'
+import ConditionalTokens from './contracts/ConditionalTokens.json'
 
 const ipfs = require("nano-ipfs-store").at("https://ipfs.infura.io:5001");
 
@@ -44,7 +46,10 @@ class App extends Component {
       openSetOutcomeBet: 0,
       web3: null,
       balance: 0,
-      betslip: []
+      betslip: [],
+      router: null,
+      ct: null,
+      positions: []
     }
     this.addEventData = this.addEventData.bind(this)
   }
@@ -152,6 +157,25 @@ class App extends Component {
     }
   }
 
+  handleApprove = (e) => {
+    try{
+      this.state.currency.methods.approve(this.state.router._address,this.state.web3.utils.toWei('100')).send({from: this.state.account})
+      .once('receipt', ((receipt) => {
+        console.log('100 USD allowance')
+      }))
+    } catch (err) {
+      console.log('Error', err)
+    }
+    try{
+      this.state.currency.methods.approve(this.state.factory._address,this.state.web3.utils.toWei('100')).send({from: this.state.account})
+      .once('receipt', ((receipt) => {
+        console.log('100 USD allowance')
+      }))
+    } catch (err) {
+      console.log('Error', err)
+    }
+  }
+
   handleRemoveBet = (e) => {
     var obj = [...this.state.betslip]
     if(e !== -1) {
@@ -237,15 +261,15 @@ class App extends Component {
     } else{
       console.log(`Attempting to buy ${this.state.quotedAmount} shares on option [${this.state.betslip[0].outcome}] on event: ${ev} at address ${this.state.betslip[0].event}`)
     }
-    /*try{
-          this.state.event[this.state.openBetBet].methods.buyshares(this.state.openBetOption,new this.state.web3.utils.BN(this.state.quotedAmount).shln(64)).send({from: this.state.account})
+    try{
+          this.state.router.methods.buySingleEvent(this.state.betslip[0].event,this.state.betslip[0].outcome,new this.state.web3.utils.BN(this.state.quotedAmount).shln(64)).send({from: this.state.account})
           .once('receipt', ((receipt) => {
             console.log('Placed Bet!')
             this.setState({openBet: false})
           }))
         } catch (err) {
           console.log('Error', err)
-        }*/
+        }
   }
 
   addEventData (address,title,description,question,options,endTime,resultTime, outcome, price, balances, state) {
@@ -292,10 +316,10 @@ class App extends Component {
 
     this.setState({web3})
 
-    const factory = new web3.eth.Contract(FactoryContract.abi, '0x8B0D1f8149AC0c6234bBdA4F3d1bcd6221a6b26F')
+    const factory = new web3.eth.Contract(FactoryContract.abi, '0x94D65b282B7C1Bc03866c03057614F71d1885327')
     this.setState({factory})
 
-    const currency = new web3.eth.Contract(FakeDai.abi, '0x97a4a87A7B8f922f9A5fF3b20A43C0Ca236aF184')
+    const currency = new web3.eth.Contract(FakeDai.abi, '0xf13a7d98d47937d5255Bdf376F3d07005A8D7614')
     this.setState({currency})
 
     const balance = await currency.methods.balanceOf(this.state.account).call()
@@ -303,6 +327,10 @@ class App extends Component {
 
     const numEvents = await factory.methods.getNumberOfMarkets().call()
     this.setState({numberOfEvents: numEvents})
+
+    const router = new web3.eth.Contract(Router.abi, '0x76A51ee70D8d20254eA747Ae760B2045fFc29E8B')
+    this.setState({router})
+
     /*const arbitrator = new web3.eth.Contract(ArbitratorContract.abi,'0x91F95Fb01487490245502f0DA6CFaaAd0032B7dc')
     this.setState({arbitrator})
 
@@ -314,6 +342,23 @@ class App extends Component {
       })
 
     }*/
+
+    const ct = new web3.eth.Contract(ConditionalTokens.abi,'0x055fdA6703458E079e6bdd873e079bC7d67D2eC1')
+    this.setState({ct})
+
+    let tokens = await ct.getPastEvents('TransferSingle', {fromBlock: 0, toBlock: 'latest'})
+    tokens.map(async (ev,ke) => {
+      if(ev.returnValues.to == this.state.account) {
+        var i = this.state.positions.map(function(o) {return o.id;}).indexOf(ev.returnValues.id)
+        if(i < 0) {
+          var obj = {
+            id: ev.returnValues.id,
+            amount: ev.returnValues.amount//await ct.methods.balanceOf(this.state.account,ev.returnValues.id).call()
+          }
+          this.setState({positions: [...this.state.positions, obj]})
+        }
+      }
+    })
 
     for(var i=0;i<numEvents;i++) {
       var addr = await factory.methods.getMarket(i).call()
@@ -412,6 +457,7 @@ class App extends Component {
             Your balance: ${Number.parseFloat(this.state.web3.utils.fromWei(this.state.balance)).toFixed(2)}
           </Typography>
           <Button colour="primary" type="submit" size="large" style = {{backgroundColor: "#FFFFFF", color : "#ED1C24"}}  variant="contained" component="span" onClick={this.handleMint}> Give me $100! </Button>
+          <Button colour="primary" type="submit" size="large" style = {{backgroundColor: "#FFFFFF", color : "#ED1C24"}}  variant="contained" component="span" onClick={this.handleApprove}> Approve All </Button>
           </div>
         </AppBar>
       </header>

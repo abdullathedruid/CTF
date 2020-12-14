@@ -3,8 +3,10 @@ pragma solidity ^0.6.0;
 import "./interfaces/IArbitrable.sol";
 import "./interfaces/IArbitrator.sol";
 import "./interfaces/IEvidence.sol";
-import { ABDKMath } from "./ABDKMath64x64.sol";
+import "./interfaces/ISCMMaker.sol";
+import {ABDKMath} from "./ABDKMath64x64.sol";
 import "./ConditionalTokens.sol";
+import "@openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol";
 
 contract SCFactory {
 
@@ -22,6 +24,7 @@ contract SCFactory {
 
     function createMarket(uint _numOptions, uint256 endTime, string memory hash) public {
         market[markets] = new SCMMaker(msg.sender, currency, conditionaltokens, _numOptions,endTime, hash);
+        require(IERC20(currency).transferFrom(msg.sender,address(market[markets]),100*10**18));
         emit MarketCreated(market[markets]);
         markets++;
     }
@@ -36,7 +39,7 @@ contract SCFactory {
 
 }
 
-contract SCMMaker is IArbitrable, IEvidence{
+contract SCMMaker is IArbitrable, IEvidence, ISCMMaker, IERC1155Receiver{
 
     uint public numOfOutcomes; //How many different options can you bet on
     uint private outcome; //the resolved outcome
@@ -113,14 +116,16 @@ contract SCMMaker is IArbitrable, IEvidence{
 
     function costafterbuy(uint _outcome, int128 amount) public view returns (int128) { //Getter function, designed for front end
         int128 sumtotal;
-        int128 _b = ABDKMath.mul(ABDKMath.add(total_balance,amount),alpha);
         int128[] memory newq = new int128[](q.length);
+        int128 TB = total_balance;
         for(uint j=0;j<numOfOutcomes;j++) {
           newq[j] = q[j];
           if(_outcome & (1<<j) !=0) {
             newq[j] = ABDKMath.add(newq[j],amount);
+            TB = ABDKMath.add(TB,amount);
           }
         }
+        int128 _b = ABDKMath.mul(TB,alpha);
         for(uint i=0; i<numOfOutcomes;i++) {
           sumtotal = ABDKMath.add(sumtotal,
             ABDKMath.exp(
@@ -146,7 +151,7 @@ contract SCMMaker is IArbitrable, IEvidence{
     return partx;
 }
 
-    function buyshares(uint _outcome, int128 amount) public returns (int128 spot_price) {
+    function buyshares(address _user, uint _outcome, int128 amount) public override returns (int128 spot_price) {
         require(status == Status.BettingOpen,'No more bets'); // There should be a check in the front-end to make sure that betting is open (also check endTimestamp), otherwise that would suck for you to spend gas
         require(amount < total_balance,"Buying too many shares!"); //user will never get a good price for this bet, so save on some gas
         if(block.timestamp > endTimestamp) { //If the user tries to place a bet but it's too late, then they can pay the gas to switch state
@@ -154,26 +159,29 @@ contract SCMMaker is IArbitrable, IEvidence{
         } else {
             int128 new_cost;
             int128 sumtotal;
-            total_balance = ABDKMath.add(total_balance,amount);
-            b = ABDKMath.mul(total_balance,alpha);
-            q[_outcome] = ABDKMath.add(q[_outcome],amount);
-            balances[_outcome][msg.sender] = ABDKMath.add(balances[_outcome][msg.sender],amount);
-            for(uint i=0; i<numOfOutcomes;i++) {
-                sumtotal = ABDKMath.add(sumtotal,
-                ABDKMath.exp(
-                    ABDKMath.div(q[i],
-                    b)
-                ));
+            for(uint j=0;j<numOfOutcomes;j++) {
+              if(_outcome & (1<<j) !=0) {
+                q[j] = ABDKMath.add(q[j],amount);
+                total_balance = ABDKMath.add(total_balance,amount);
+              }
             }
-            new_cost = ABDKMath.mul(b,ABDKMath.ln(sumtotal));
+            int128 _b = ABDKMath.mul(total_balance,amount,alpha);
+            for(uint i=0; i<numOfOutcomes;i++) {
+              sumtotal = ABDKMath.add(sumtotal,
+                ABDKMath.exp(
+                  ABDKMath.div(q[i],
+                _b)
+              ));
+            }
+            new_cost = ABDKMath.mul(_b,ABDKMath.ln(sumtotal));
             spot_price = ABDKMath.sub(new_cost,current_cost);
             uint uprice = ABDKMath.mulu(spot_price,10**18);
             uint uamount = ABDKMath.mulu(amount,10**18);
-            require(IERC20(currency).transfer(address(this),uprice));
+            require(IERC20(currency).transferFrom(msg.sender,address(this),uprice));
             IERC20(currency).approve(address(CT),uamount);
-            CT.splitPosition(IERC20(currency),bytes32(0),condition,getInversePartition(1<<_outcome,numOfOutcomes),uamount);
-            uint pos = CT.getPositionId(IERC20(currency),CT.getCollectionId(bytes32(0),condition,1<<_outcome));
-            CT.safeTransferFrom(address(this),msg.sender,pos,uamount,'');
+            CT.splitPosition(IERC20(currency),bytes32(0),condition,getInversePartition(_outcome,numOfOutcomes),uamount);
+            uint pos = CT.getPositionId(IERC20(currency),CT.getCollectionId(bytes32(0),condition,_outcome));
+            CT.safeTransferFrom(address(this),_user,pos,uamount,'');
             current_cost = new_cost;
         }
     }
@@ -246,4 +254,33 @@ contract SCMMaker is IArbitrable, IEvidence{
     function getOutcome() public view returns (uint) {
         return outcome;
     }
+
+    function onERC1155Received(
+        address operator,
+        address from,
+        uint256 id,
+        uint256 value,
+        bytes calldata data
+    )
+        external
+        override
+        returns(bytes4) {
+            return this.onERC1155Received.selector;
+        }
+
+    function onERC1155BatchReceived(
+        address operator,
+        address from,
+        uint256[] calldata ids,
+        uint256[] calldata values,
+        bytes calldata data
+    )
+        external
+        override
+        returns(bytes4) {
+            return this.onERC1155BatchReceived.selector;
+        }
+
+    function supportsInterface(bytes4 interfaceId) external override view returns (bool) {}
+
 }
