@@ -97,7 +97,7 @@ class Betslip extends Component {
           return(
             <ListItem>
               <Container>
-              <IconButton color="primary" aria-label="upload picture" component="span" id={key} onClick={this.handleRemoveBet}>
+              <IconButton color="primary" component="span" id={key} onClick={this.handleRemoveBet}>
                 <CancelIcon id={key}/>
               </IconButton>
               {this.props.state.eventData[this.props.state.eventData.map(function(o) {return o.address;}).indexOf(bet.event)].title}
@@ -118,7 +118,7 @@ class Betslip extends Component {
         </List>
         </div>
         <div>
-          <TextField label="Outcome tokens to buy" fullWidth value={this.props.state.quotedAmount} onChange={this.props.handleChangePurchaseSingleSize}></TextField>
+          <TextField label="Outcome tokens to buy" fullWidth onChange={this.props.handleChangePurchaseComboSize} value={this.props.state.quotedAmount}></TextField>
           <TextField label="Price" fullWidth value={this.props.state.quotedPrice}></TextField>
           <Button colour="primary" type="submit" size="large" style = {{backgroundColor: "#ED1C24", color : "#FFFFFF"}}  variant="contained" component="span" > Submit {"C-".repeat(this.props.state.betslip.length-1)}COMBO bet </Button>
         </div>

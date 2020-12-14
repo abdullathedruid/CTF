@@ -73,7 +73,7 @@ class CreateMarket extends Component {
   handleSubmit = (e) => {
     let metaevidence = generateMetaEvidence(this.state.title,this.state.category,this.state.description,this.state.question,this.state.options,this.props.state.account)
 
-    this.props.createMarket(metaevidence,this.state.number,this.state.endTime,this.state.endTime);
+    this.props.createMarket(metaevidence,this.state.number,this.state.endTime);
   }
 
   render() {

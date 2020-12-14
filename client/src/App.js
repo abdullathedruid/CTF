@@ -9,9 +9,9 @@ import Bets from './Bets'
 import Betslip from './Betslip'
 
 import Web3 from 'web3';
-import EventContract from './SCEvent.json'
-import ArbitratorContract from './SimpleCentralizedArbitrator.json'
-import FactoryContract from './SCFactory.json'
+import EventContract from './contracts/SCMMaker.json'
+import ArbitratorContract from './contracts/SimpleCentralizedArbitrator.json'
+import FactoryContract from './contracts/SCFactory.json'
 import FakeDai from './contracts/FakeDai.json'
 
 const ipfs = require("nano-ipfs-store").at("https://ipfs.infura.io:5001");
@@ -64,16 +64,6 @@ class App extends Component {
     this.setState({openSetOutcomeBet: b})
   }
 
-  handleChangePurchaseSize = (e,bet) => {
-    if(e.target.value == 0) {
-      this.setState({quotedPrice: 0})
-    }
-    this.state.event[this.state.openBetBet].methods.price(this.state.openBetOption,new this.state.web3.utils.BN(e.target.value).shln(64)).call().then((res) => {
-      this.setState({quotedPrice: res/1000000})
-    })
-    this.setState({quotedAmount: e.target.value})
-  }
-
   async componentDidMount() {
     await this.loadWeb3()
     await this.loadData()
@@ -96,12 +86,12 @@ class App extends Component {
     }
   }
 
-  handleCreateMarket = (data,numOptions,endTime,resultTime) => {
+  handleCreateMarket = (data,numOptions,endTime) => {
     try{
-    console.log('Attempting to add event: ',numOptions,endTime,resultTime,data)
+    console.log('Attempting to add event: ',numOptions,endTime,data)
     ipfs.add(enc.encode(JSON.stringify(data))).then((ipfsHash) => {
       console.log('/ipfs/'+ipfsHash)
-      this.state.factory.methods.createMarket(numOptions,endTime,resultTime,'/ipfs/'+ipfsHash).send({from: this.state.account})
+      this.state.factory.methods.createMarket(numOptions,endTime,'/ipfs/'+ipfsHash).send({from: this.state.account})
       .once('receipt', ((receipt) => {
         try {
           console.log('Market successfully created!!')
@@ -198,9 +188,30 @@ class App extends Component {
       evid= key
     }})
   this.state.event[evid].methods.price(this.state.betslip[0].outcome,new this.state.web3.utils.BN(e.target.value).shln(64)).call().then((res) => {
-    this.setState({quotedPrice: res/1000000})
+    this.setState({quotedPrice: (res/1000000).toFixed(2)})
   })
 }
+
+  handleChangePurchaseComboSize = async (e) => {
+    this.setState({quotedAmount: e.target.value})
+    if(e.target.value == 0) {
+      this.setState({quotedPrice: 0})
+    }
+    var evid=0
+    var price = e.target.value
+    var po=0;
+    this.state.betslip.map(async (bet,key) => {
+      this.state.eventData.map((ev,ke) => {
+        if(ev.address == bet.event) {
+          evid = ke
+        }
+      })
+      var size = e.target.value/this.state.betslip.length
+      po = await this.state.event[evid].methods.price(this.state.betslip[key].outcome,new this.state.web3.utils.BN(size).shln(64)).call()
+      price *= po/1000000/size
+      this.setState({quotedPrice: price.toFixed(2)})
+    })
+  }
 
   alterBet = (key,val) => {
     var newobj = this.state.betslip
@@ -281,10 +292,10 @@ class App extends Component {
 
     this.setState({web3})
 
-    const factory = new web3.eth.Contract(FactoryContract.abi, '0x08EBE7dA097499754EBC47Ea2121A1EB87936e34')
+    const factory = new web3.eth.Contract(FactoryContract.abi, '0x8B0D1f8149AC0c6234bBdA4F3d1bcd6221a6b26F')
     this.setState({factory})
 
-    const currency = new web3.eth.Contract(FakeDai.abi, '0x5D6BD6ab1737740ac4f86fbBa93c3B7454f7477F')
+    const currency = new web3.eth.Contract(FakeDai.abi, '0x97a4a87A7B8f922f9A5fF3b20A43C0Ca236aF184')
     this.setState({currency})
 
     const balance = await currency.methods.balanceOf(this.state.account).call()
@@ -292,7 +303,7 @@ class App extends Component {
 
     const numEvents = await factory.methods.getNumberOfMarkets().call()
     this.setState({numberOfEvents: numEvents})
-    const arbitrator = new web3.eth.Contract(ArbitratorContract.abi,'0x91F95Fb01487490245502f0DA6CFaaAd0032B7dc')
+    /*const arbitrator = new web3.eth.Contract(ArbitratorContract.abi,'0x91F95Fb01487490245502f0DA6CFaaAd0032B7dc')
     this.setState({arbitrator})
 
     const numArbs = await arbitrator.methods.getNumberOfDisputes().call()
@@ -302,7 +313,7 @@ class App extends Component {
         this.addDisputeData(response)
       })
 
-    }
+    }*/
 
     for(var i=0;i<numEvents;i++) {
       var addr = await factory.methods.getMarket(i).call()
@@ -313,7 +324,7 @@ class App extends Component {
       var price = []
       var balances = []
       for (var j=0; j<numOptions; j++) {
-        price[j] = (await ev.methods.price(0,new web3.utils.BN('18446744073709551616')).call()/1000000).toFixed(2)
+        price[j] = (await ev.methods.price(2**j,new web3.utils.BN('18446744073709551616')).call()/1000000).toFixed(2)
       }
 
       var outcome = await ev.methods.getOutcome().call()
@@ -355,7 +366,7 @@ class App extends Component {
     var price = []
     var balances = []
     for (var j=0; j<numOptions; j++) {
-      price[j] = (await ev.methods.price(j,new this.state.web3.utils.BN('18446744073709551616')).call()/1000000).toFixed(2)
+      price[j] = (await ev.methods.price(2**j,new this.state.web3.utils.BN('18446744073709551616')).call()/1000000).toFixed(2)
     }
 
     var outcome = await ev.methods.getOutcome().call()
@@ -415,7 +426,7 @@ class App extends Component {
         <Bets handleDispute={this.handleDispute} handleSetOutcome = {this.handleSetOutcome} handleOpenSetOutcome={this.handleOpenSetOutcome} handleCloseSetOutcome={this.handleCloseSetOutcome} handlePlaceBet={this.handlePlaceBet} handleChangePurchaseSize={this.handleChangePurchaseSize} state={this.state} openSetOutcome={this.state.openSetOutcome} open={this.state.openBet} handleClose={this.handleCloseBet} handleOpen={this.handleOpenBet}/>
       </Grid>
       <Grid item xs={4}>
-        <Betslip handleSingleSubmit={this.handleSingleSubmit} handleChangePurchaseSingleSize={this.handleChangePurchaseSingleSize} alterBet={this.alterBet} handleRemoveBet={this.handleRemoveBet} handleDisputeOutcome={this.handleDisputeOutcome} state={this.state}/>
+        <Betslip handleSingleSubmit={this.handleSingleSubmit} handleChangePurchaseSingleSize={this.handleChangePurchaseSingleSize} handleChangePurchaseComboSize={this.handleChangePurchaseComboSize} alterBet={this.alterBet} handleRemoveBet={this.handleRemoveBet} handleDisputeOutcome={this.handleDisputeOutcome} state={this.state}/>
       </Grid>
     </Grid>
     </main>

@@ -20,8 +20,8 @@ contract SCFactory {
       conditionaltokens = _ctf;
     }
 
-    function createMarket(uint _numOptions, uint256 endTime, uint256 resultTime, string memory hash) public {
-        market[markets] = new SCMMaker(msg.sender, currency, conditionaltokens, _numOptions,endTime, resultTime, hash);
+    function createMarket(uint _numOptions, uint256 endTime, string memory hash) public {
+        market[markets] = new SCMMaker(msg.sender, currency, conditionaltokens, _numOptions,endTime, hash);
         emit MarketCreated(market[markets]);
         markets++;
     }
@@ -74,7 +74,7 @@ contract SCMMaker is IArbitrable, IEvidence{
      * alpha is calculated as a constant that is used later on
      * need to add endtime, result time, and ipfs hash
      **/
-    constructor(address _owner, address _currency, address _ct, uint _numOptions, uint256 endTime, uint256 resultTime, string memory hash) public {
+    constructor(address _owner, address _currency, address _ct, uint _numOptions, uint256 endTime, string memory hash) public {
         numOfOutcomes = _numOptions;
         currency = _currency;
         int128 IL = ABDKMath.fromUInt(100); //this will be dai.balanceOf
@@ -91,7 +91,7 @@ contract SCMMaker is IArbitrable, IEvidence{
         }
         current_cost = ABDKMath.mul(b,ABDKMath.ln(sumtotal));
         endTimestamp = endTime;
-        resultTimestamp = resultTime;
+        resultTimestamp = endTime;
         emit MetaEvidence(0,hash);
         CT = ConditionalTokens(_ct);
         CT.prepareCondition(_owner,bytes32(uint256(address(this)) << 96),_numOptions);
