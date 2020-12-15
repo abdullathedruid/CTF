@@ -213,29 +213,24 @@ class App extends Component {
     if (ev.address == this.state.betslip[0].event) {
       evid= key
     }})
-  this.state.event[evid].methods.price(this.state.betslip[0].outcome,new this.state.web3.utils.BN(e.target.value).shln(64)).call().then((res) => {
+  this.state.event[evid].methods.priceU(this.state.betslip[0].outcome,new this.state.web3.utils.BN(e.target.value).shln(64)).call().then((res) => {
     this.setState({quotedPrice: (res/1000000).toFixed(2)})
   })
 }
 
-  handleChangePurchaseComboSize = async (e) => {
+  handleChangePurchaseComboSize =  (e) => {
     this.setState({quotedAmount: e.target.value})
     if(e.target.value == 0) {
       this.setState({quotedPrice: 0})
     }
-    var evid=0
-    var price = e.target.value
-    var po=0;
+    var bets=[]
+    var outcomes=[]
     this.state.betslip.map(async (bet,key) => {
-      this.state.eventData.map((ev,ke) => {
-        if(ev.address == bet.event) {
-          evid = ke
-        }
-      })
-      var size = e.target.value/this.state.betslip.length
-      po = await this.state.event[evid].methods.price(this.state.betslip[key].outcome,new this.state.web3.utils.BN(size).shln(64)).call()
-      price *= po/1000000/size
-      this.setState({quotedPrice: price.toFixed(2)})
+      bets.push(bet.event)
+      outcomes.push(bet.outcome)
+    })
+    this.state.router.methods.getComboEventPrice(bets,outcomes,new this.state.web3.utils.BN(e.target.value).shln(64)).call().then((res) => {
+      this.setState({quotedPrice: (res/(2**64)).toFixed(2)})
     })
   }
 
@@ -267,7 +262,23 @@ class App extends Component {
           this.state.router.methods.buySingleEvent(this.state.betslip[0].event,this.state.betslip[0].outcome,new this.state.web3.utils.BN(this.state.quotedAmount).shln(64)).send({from: this.state.account})
           .once('receipt', ((receipt) => {
             console.log('Placed Bet!')
-            this.setState({openBet: false})
+          }))
+        } catch (err) {
+          console.log('Error', err)
+        }
+  }
+
+  handleComboSubmit = (e) => {
+    var bets=[]
+    var outcomes=[]
+    this.state.betslip.map(async (bet,key) => {
+      bets.push(bet.event)
+      outcomes.push(bet.outcome)
+    })
+    try{
+          this.state.router.methods.buyComboEvent(bets,outcomes,new this.state.web3.utils.BN(this.state.quotedAmount).shln(64)).send({from: this.state.account})
+          .once('receipt', ((receipt) => {
+            console.log('Placed Bet!')
           }))
         } catch (err) {
           console.log('Error', err)
@@ -318,10 +329,10 @@ class App extends Component {
 
     this.setState({web3})
 
-    const factory = new web3.eth.Contract(FactoryContract.abi, '0x93Bec90AB76e2f2950201b763FD66D167eDCae54')
+    const factory = new web3.eth.Contract(FactoryContract.abi, '0xFf4D99D518DfEBbE2a9a8C46f30C74F065Fe0805')
     this.setState({factory})
 
-    const currency = new web3.eth.Contract(FakeDai.abi, '0xdaD7A786c573263ee1D613578A05E8a8F179f5A3')
+    const currency = new web3.eth.Contract(FakeDai.abi, '0x2B618c75Dfa2Ca90724D13758bafaE5A59342897')
     this.setState({currency})
 
     const balance = await currency.methods.balanceOf(this.state.account).call()
@@ -330,7 +341,7 @@ class App extends Component {
     const numEvents = await factory.methods.getNumberOfMarkets().call()
     this.setState({numberOfEvents: numEvents})
 
-    const router = new web3.eth.Contract(Router.abi, '0xBc9c135faaad1A496Ea670b38D2e4aE538Ad41Cb')
+    const router = new web3.eth.Contract(Router.abi, '0xc79D724C89f2F99FE479774Be85CA39C29f7937c')
     this.setState({router})
 
     /*const arbitrator = new web3.eth.Contract(ArbitratorContract.abi,'0x91F95Fb01487490245502f0DA6CFaaAd0032B7dc')
@@ -345,7 +356,7 @@ class App extends Component {
 
     }*/
 
-    const ct = new web3.eth.Contract(ConditionalTokens.abi,'0xa9a186470B32feF11F661376FA1CF4eaE113fC12')
+    const ct = new web3.eth.Contract(ConditionalTokens.abi,'0xfE8767FFc59B63403757CF0034a50fbFB8E6faA6')
     this.setState({ct})
 
     let tokens = await ct.getPastEvents('TransferSingle', {fromBlock: 0, toBlock: 'latest'})
@@ -371,7 +382,7 @@ class App extends Component {
       var price = []
       var balances = []
       for (var j=0; j<numOptions; j++) {
-        price[j] = (await ev.methods.price(2**j,new web3.utils.BN('18446744073709551616')).call()/1000000).toFixed(2)
+        price[j] = (await ev.methods.priceU(2**j,new web3.utils.BN('18446744073709551616')).call()/1000000).toFixed(2)
       }
 
       var outcome = await ev.methods.getOutcome().call()
@@ -406,27 +417,29 @@ class App extends Component {
   }
 
   async updateMarkets(addr) {
-    var ev = new this.state.web3.eth.Contract(EventContract.abi, addr)
-    this.setState({event: [...this.state.event,ev]})
+    if(this.state.eventData.map(function(o) {return o.address;}).indexOf(addr) == -1) {
+      var ev = new this.state.web3.eth.Contract(EventContract.abi, addr)
+      this.setState({event: [...this.state.event,ev]})
 
-    var numOptions = await ev.methods.numOfOutcomes().call()
-    var price = []
-    var balances = []
-    for (var j=0; j<numOptions; j++) {
-      price[j] = (await ev.methods.price(2**j,new this.state.web3.utils.BN('18446744073709551616')).call()/1000000).toFixed(2)
+      var numOptions = await ev.methods.numOfOutcomes().call()
+      var price = []
+      var balances = []
+      for (var j=0; j<numOptions; j++) {
+        price[j] = (await ev.methods.priceU(2**j,new this.state.web3.utils.BN('18446744073709551616')).call()/1000000).toFixed(2)
+      }
+
+      var outcome = await ev.methods.getOutcome().call()
+      var endTime = await ev.methods.endTimestamp().call()
+      var resultTime = await ev.methods.resultTimestamp().call()
+
+      var state = await ev.methods.status().call()
+      let output = await ev.getPastEvents('MetaEvidence', {fromBlock: 0, toBlock: 'latest'})
+      var metaevidence = output[0].returnValues._evidence;
+
+      let ipfs = await fetch('https://gateway.ipfs.io'+metaevidence)
+      var responseJSON = await ipfs.json()
+      this.addEventData(addr,responseJSON.title, responseJSON.description, responseJSON.question, responseJSON.rulingOptions.descriptions,endTime,resultTime,outcome,price,balances,state)
     }
-
-    var outcome = await ev.methods.getOutcome().call()
-    var endTime = await ev.methods.endTimestamp().call()
-    var resultTime = await ev.methods.resultTimestamp().call()
-
-    var state = await ev.methods.status().call()
-    let output = await ev.getPastEvents('MetaEvidence', {fromBlock: 0, toBlock: 'latest'})
-    var metaevidence = output[0].returnValues._evidence;
-
-    let ipfs = await fetch('https://gateway.ipfs.io'+metaevidence)
-    var responseJSON = await ipfs.json()
-    this.addEventData(addr,responseJSON.title, responseJSON.description, responseJSON.question, responseJSON.rulingOptions.descriptions,endTime,resultTime,outcome,price,balances,state)
   }
 
   async updatePrices(addr) {
@@ -434,7 +447,7 @@ class App extends Component {
     var numOptions = await ev.methods.numOfOutcomes().call()
     var price = []
     for (var j=0; j<numOptions; j++) {
-      price[j] = (await ev.methods.price(2**j,new this.state.web3.utils.BN('18446744073709551616')).call()/1000000).toFixed(2)
+      price[j] = (await ev.methods.priceU(2**j,new this.state.web3.utils.BN('18446744073709551616')).call()/1000000).toFixed(2)
     }
     var index = this.state.eventData.map(function(o) {return o.address;}).indexOf(addr)
     if(index>=0) {
@@ -492,7 +505,7 @@ class App extends Component {
         <Bets handleDispute={this.handleDispute} handleSetOutcome = {this.handleSetOutcome} handleOpenSetOutcome={this.handleOpenSetOutcome} handleCloseSetOutcome={this.handleCloseSetOutcome} handlePlaceBet={this.handlePlaceBet} handleChangePurchaseSize={this.handleChangePurchaseSize} state={this.state} openSetOutcome={this.state.openSetOutcome} open={this.state.openBet} handleClose={this.handleCloseBet} handleOpen={this.handleOpenBet}/>
       </Grid>
       <Grid item xs={4}>
-        <Betslip handleSingleSubmit={this.handleSingleSubmit} handleChangePurchaseSingleSize={this.handleChangePurchaseSingleSize} handleChangePurchaseComboSize={this.handleChangePurchaseComboSize} alterBet={this.alterBet} handleRemoveBet={this.handleRemoveBet} handleDisputeOutcome={this.handleDisputeOutcome} state={this.state}/>
+        <Betslip handleComboSubmit={this.handleComboSubmit} handleSingleSubmit={this.handleSingleSubmit} handleChangePurchaseSingleSize={this.handleChangePurchaseSingleSize} handleChangePurchaseComboSize={this.handleChangePurchaseComboSize} alterBet={this.alterBet} handleRemoveBet={this.handleRemoveBet} handleDisputeOutcome={this.handleDisputeOutcome} state={this.state}/>
       </Grid>
     </Grid>
     </main>

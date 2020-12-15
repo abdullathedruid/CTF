@@ -126,7 +126,7 @@ class Betslip extends Component {
         <div>
           <TextField label="Outcome tokens to buy" fullWidth onChange={this.props.handleChangePurchaseComboSize} value={this.props.state.quotedAmount}></TextField>
           <TextField label="Price" fullWidth value={this.props.state.quotedPrice}></TextField>
-          <Button colour="primary" type="submit" size="large" style = {{backgroundColor: "#ED1C24", color : "#FFFFFF"}}  variant="contained" component="span" > Submit {"C-".repeat(this.props.state.betslip.length-1)}COMBO bet </Button>
+          <Button onClick = {this.props.handleComboSubmit} colour="primary" type="submit" size="large" style = {{backgroundColor: "#ED1C24", color : "#FFFFFF"}}  variant="contained" component="span" > Submit {"C-".repeat(this.props.state.betslip.length-1)}COMBO bet </Button>
         </div>
         </Container>
       )

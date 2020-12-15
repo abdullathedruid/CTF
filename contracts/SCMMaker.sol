@@ -114,6 +114,14 @@ contract SCMMaker is IArbitrable, IEvidence, ISCMMaker, IERC1155Receiver{
         return ABDKMath.mul(b,ABDKMath.ln(sumtotal));
     }
 
+    function getCondition() public view override returns (bytes32) {
+      return condition;
+    }
+
+    function getNumberOutcomes() public view override returns (uint) {
+      return numOfOutcomes;
+    }
+
     function costafterbuy(uint _outcome, int128 amount) public view returns (int128) { //Getter function, designed for front end
         int128 sumtotal;
         int128[] memory newq = new int128[](q.length);
@@ -136,8 +144,11 @@ contract SCMMaker is IArbitrable, IEvidence, ISCMMaker, IERC1155Receiver{
         return ABDKMath.mul(_b,ABDKMath.ln(sumtotal));
     }
 
-    function price(uint _outcome, int128 amount) public view returns (uint256) { // Getter function, designed for the frontend
+    function priceU(uint _outcome, int128 amount) public view override returns (uint256) { // Getter function, designed for the frontend
        return ABDKMath.mulu(ABDKMath.sub(costafterbuy(_outcome,amount),cost()),1000000);
+    }
+    function priceI(uint _outcome, int128 amount) public view override returns (int128) { // Getter function, designed for the frontend
+       return ABDKMath.sub(costafterbuy(_outcome,amount),cost());
     }
 
     function getIndexSet(uint _set) public pure returns (uint) {
@@ -145,11 +156,11 @@ contract SCMMaker is IArbitrable, IEvidence, ISCMMaker, IERC1155Receiver{
     }
 
     function getInversePartition(uint256 index, uint256 len) public pure returns (uint256[] memory) {
-    uint256[] memory partx = new uint256[](2);
-    partx[0] = index;
-    partx[1] = (1<<len)-1-index;
-    return partx;
-}
+      uint256[] memory partx = new uint256[](2);
+      partx[0] = index;
+      partx[1] = (1<<len)-1-index;
+      return partx;
+    }
 
     function buyshares(address _user, uint _outcome, int128 amount) public override returns (int128 spot_price) {
         require(status == Status.BettingOpen,'No more bets'); // There should be a check in the front-end to make sure that betting is open (also check endTimestamp), otherwise that would suck for you to spend gas
@@ -184,6 +195,34 @@ contract SCMMaker is IArbitrable, IEvidence, ISCMMaker, IERC1155Receiver{
             CT.safeTransferFrom(address(this),_user,pos,uamount,'');
             current_cost = new_cost;
         }
+    }
+
+    function buyvirtualshares(address _user, uint _outcome, int128 amount) public override returns (int128 spot_price) {
+      require(status == Status.BettingOpen,'No more bets'); // There should be a check in the front-end to make sure that betting is open (also check endTimestamp), otherwise that would suck for you to spend gas
+      require(amount < total_balance,"Buying too many shares!"); //user will never get a good price for this bet, so save on some gas
+      if(block.timestamp > endTimestamp) { //If the user tries to place a bet but it's too late, then they can pay the gas to switch state
+          status = Status.NoMoreBets;
+      } else {
+          int128 new_cost;
+          int128 sumtotal;
+          for(uint j=0;j<numOfOutcomes;j++) {
+            if((_outcome & (1<<j)) !=0) {
+              q[j] = ABDKMath.add(q[j],amount);
+              total_balance = ABDKMath.add(total_balance,amount);
+            }
+          }
+          b = ABDKMath.mul(total_balance,alpha);
+          for(uint i=0; i<numOfOutcomes;i++) {
+            sumtotal = ABDKMath.add(sumtotal,
+              ABDKMath.exp(
+                ABDKMath.div(q[i],
+              b)
+            ));
+          }
+          new_cost = ABDKMath.mul(b,ABDKMath.ln(sumtotal));
+          spot_price = ABDKMath.sub(new_cost,current_cost);
+          current_cost = new_cost;
+      }
     }
 
     /*
