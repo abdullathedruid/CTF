@@ -356,7 +356,10 @@ class App extends Component {
     const router = new web3.eth.Contract(Router.abi, '0xcaAb49eaAB4b76198349721443bd0593C63b0Ff1')
     this.setState({router})
 
-    /*const arbitrator = new web3.eth.Contract(ArbitratorContract.abi,'0x91F95Fb01487490245502f0DA6CFaaAd0032B7dc')
+    /*
+    //This is the arbitrator code for the kleros hackathon
+    //Don't need to deploy it for CTF 
+    const arbitrator = new web3.eth.Contract(ArbitratorContract.abi,'0x91F95Fb01487490245502f0DA6CFaaAd0032B7dc')
     this.setState({arbitrator})
 
     const numArbs = await arbitrator.methods.getNumberOfDisputes().call()
@@ -371,15 +374,12 @@ class App extends Component {
     const ct = new web3.eth.Contract(ConditionalTokens.abi,'0xa5FB77460aB44df9AF15253c343ac92244367f24')
     this.setState({ct})
 
-    //let combos = await router.getPastEvents('ComboBetCreated', {fromBlock: 0, toBlock: 'latest'})
-    //Promise.all(combos.map(async (ev,ke) => {
-    //}))
-
+    //This won't work on web3 because of some overflow issue but it works with ethers. How odd
     const routerethers = new ethers.Contract('0xcaAb49eaAB4b76198349721443bd0593C63b0Ff1',Router.abi,ethersprovider)
     let filter = routerethers.filters.ComboBetCreated(null,this.state.account,null,null,null)
     let combobets = await routerethers.queryFilter(filter,0,100000)
     Promise.all(combobets.map((combo,key) => {
-      var position = combo.args[2]._hex //positionId as hex
+      var position = combo.args[2]._hex
       var eventarray = combo.args[0]
       var outcomearray = combo.args[3]
       var outcomearr = []
@@ -393,8 +393,6 @@ class App extends Component {
       }
       this.setState({comboPositions: [...this.state.comboPositions, obj]})
     }))
-
-    //console.log(routerethers.filters.ComboBetCreated(null))
 
     let tokens = await ct.getPastEvents('TransferSingle', {fromBlock: 0, toBlock: 'latest'})
     Promise.all(tokens.map(async (ev,ke) => {
@@ -549,11 +547,9 @@ class App extends Component {
     })
     createbetemitter = this.state.router.events.SingleBetCreated().on('data',(event,error) => {
       this.updatePrices(event.returnValues._event);
-      //console.log(event.returnValues)
     })
   }
-    //contract.DisputeCreate({}).on('data', (event,error) => {})*/
-  }
+}
 
   render() {
     if(this.state.loading == false ){

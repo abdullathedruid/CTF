@@ -46,7 +46,9 @@ function tryParseComboBet(state, id, amount) {
     var index = state.eventData.map(function(o) {return o.address;}).indexOf(event)
     output += state.eventData[index].title.toUpperCase()+"("+parseOutcome(state.eventData[index].options,outcomearray[koEvent])+") "
   })
-  return "$"+amount+": "+output
+  return (
+      <div>${amount}: {output}</div>
+    )
 }
 
 class BetPositions extends Component {
@@ -78,11 +80,7 @@ class BetPositions extends Component {
               </div>
             )
           } else {
-            return(
-              <div>
-                {tryParseComboBet(this.props.state, bet.id, bet.amount)}
-              </div>
-            )
+            {return(tryParseComboBet(this.props.state, bet.id, bet.amount))}
           }
         })}
       </div>
