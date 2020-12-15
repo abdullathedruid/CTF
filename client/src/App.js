@@ -50,7 +50,9 @@ class App extends Component {
       betslip: [],
       router: null,
       ct: null,
-      positions: []
+      positions: [],
+      singleCollectionId: [],
+      singlePositionId: []
     }
     this.addEventData = this.addEventData.bind(this)
   }
@@ -74,6 +76,10 @@ class App extends Component {
     await this.loadWeb3()
     await this.loadData()
     this.listenForEvents()
+    await this.getAllSingleCollectionIds()
+    .then(() => {
+      this.getAllSinglePositionIds()
+    })
   }
 
   componentWillUnmount() {
@@ -329,10 +335,10 @@ class App extends Component {
 
     this.setState({web3})
 
-    const factory = new web3.eth.Contract(FactoryContract.abi, '0xFf4D99D518DfEBbE2a9a8C46f30C74F065Fe0805')
+    const factory = new web3.eth.Contract(FactoryContract.abi, '0x82d9E841f5db5eEA0311acec65339a3a63fd55B8')
     this.setState({factory})
 
-    const currency = new web3.eth.Contract(FakeDai.abi, '0x2B618c75Dfa2Ca90724D13758bafaE5A59342897')
+    const currency = new web3.eth.Contract(FakeDai.abi, '0xF72B771dffa49a79cE0618aF3C2cCCe2d0C1620c')
     this.setState({currency})
 
     const balance = await currency.methods.balanceOf(this.state.account).call()
@@ -341,7 +347,7 @@ class App extends Component {
     const numEvents = await factory.methods.getNumberOfMarkets().call()
     this.setState({numberOfEvents: numEvents})
 
-    const router = new web3.eth.Contract(Router.abi, '0xc79D724C89f2F99FE479774Be85CA39C29f7937c')
+    const router = new web3.eth.Contract(Router.abi, '0x6879429Ea3e1a9517e336521980c92cFA81669De')
     this.setState({router})
 
     /*const arbitrator = new web3.eth.Contract(ArbitratorContract.abi,'0x91F95Fb01487490245502f0DA6CFaaAd0032B7dc')
@@ -356,22 +362,22 @@ class App extends Component {
 
     }*/
 
-    const ct = new web3.eth.Contract(ConditionalTokens.abi,'0xfE8767FFc59B63403757CF0034a50fbFB8E6faA6')
+    const ct = new web3.eth.Contract(ConditionalTokens.abi,'0x869dB603839d38c8E848c3559faeAc6D2a6104dF')
     this.setState({ct})
 
     let tokens = await ct.getPastEvents('TransferSingle', {fromBlock: 0, toBlock: 'latest'})
-    tokens.map(async (ev,ke) => {
+    Promise.all(tokens.map(async (ev,ke) => {
       if(ev.returnValues.to == this.state.account) {
         var i = this.state.positions.map(function(o) {return o.id;}).indexOf(ev.returnValues.id)
         if(i < 0) {
           var obj = {
             id: ev.returnValues.id,
-            amount: ev.returnValues.amount//await ct.methods.balanceOf(this.state.account,ev.returnValues.id).call()
+            amount: this.state.web3.utils.fromWei(await ct.methods.balanceOf(this.state.account,ev.returnValues.id).call())
           }
           this.setState({positions: [...this.state.positions, obj]})
         }
       }
-    })
+    }))
 
     for(var i=0;i<numEvents;i++) {
       var addr = await factory.methods.getMarket(i).call()
@@ -455,6 +461,49 @@ class App extends Component {
       clone[index].price = price
       this.setState({eventData: clone})
     }
+  }
+
+  async getAllSingleCollectionIds() {
+    await Promise.all(
+        this.state.event.map(async (ev,key) => {
+        var condition = await ev.methods.getCondition().call()
+        var numEvents = await ev.methods.getNumberOutcomes().call()
+        var objects = []
+        for(var i=1;i<(1<<numEvents);i++) {
+          var obj = {
+            outcome: i,
+            collection: await this.state.ct.methods.getCollectionId('0x0000000000000000000000000000000000000000000000000000000000000000',condition,i).call()
+          }
+          objects.push(obj)
+        }
+        var input= {
+          address: ev._address,
+          collections: objects
+        }
+        this.setState({singleCollectionId: [...this.state.singleCollectionId, input]})
+      })
+    )
+  }
+
+  async getAllSinglePositionIds() {
+    await Promise.all(
+      this.state.singleCollectionId.map((a, k) => {
+        var objects = []
+        a.collections.map(async (b,ke) => {
+          var position = await this.state.ct.methods.getPositionId(this.state.currency._address,b.collection).call()
+          var obj = {
+            outcome: b.outcome,
+            position: position
+          }
+          objects.push(obj)
+        })
+        var input = {
+          address: a.address,
+          positions: objects
+        }
+        this.setState({singlePositionId: [...this.state.singlePositionId, input]})
+      })
+    )
   }
 
   listenForEvents = () => {

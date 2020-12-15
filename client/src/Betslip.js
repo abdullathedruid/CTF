@@ -13,6 +13,59 @@ import CancelIcon from '@material-ui/icons/Cancel';
 import IconButton from '@material-ui/core/IconButton';
 import TextField from '@material-ui/core/TextField'
 
+function parseOutcome(options,outcome) {
+  var num = options.length
+  var output = ""
+  for(var i=0;i<num;i++) {
+    if((outcome & (1<<i)) == 0 ) {
+      continue
+    } else {
+      if(output=="") {
+        output = options[i]
+      } else {
+        output = output + "|" + options[i]
+      }
+    }
+  }
+  return output
+}
+
+
+class BetPositions extends Component {
+  constructor(props) {
+    super()
+  }
+  render() {
+    return(
+      <div>
+        Your Positions:
+        {this.props.state.positions.map((bet,key) => {
+          var betevent = -1
+          var betoutcome = -1
+          this.props.state.singlePositionId.map((positions,a) => {
+            positions.positions.map((position,b) => {
+              if(position.position == bet.id) {
+                betevent = positions.address
+                betoutcome = position.outcome
+              }
+            })
+          })
+          if(betevent!=-1) {
+            var i =this.props.state.eventData.map(function(o) {return o.address;}).indexOf(betevent)
+            var title = this.props.state.eventData[i].title
+            var outcome = parseOutcome(this.props.state.eventData[i].options,betoutcome)
+            return(
+              <div>
+              ${bet.amount}: {title}({outcome})
+              </div>
+            )
+          }
+        })}
+      </div>
+    )
+  }
+}
+
 class Betslip extends Component {
   constructor(props) {
     super()
@@ -42,15 +95,7 @@ class Betslip extends Component {
         <Container>
         <img style={{ width: "100%"}} src="dispute_outcome.png" />
         <CardMedia style={{ height: "200px" }} image="/court.png" />
-        <div>
-          {this.props.state.positions.map((bet,key) => {
-            return(
-              <div>
-              ID {bet.id}: {bet.amount}
-              </div>
-            )
-          })}
-        </div>
+          <BetPositions state={this.props.state} />
         </Container>
       )
     } else if(this.props.state.betslip.length==1) {
@@ -59,6 +104,7 @@ class Betslip extends Component {
         <img style={{ width: "100%"}} src="dispute_outcome.png" />
         <CardMedia style={{ height: "200px" }} image="/court.png" />
         <div>
+          <BetPositions state={this.props.state} />
         <List>
         {this.props.state.betslip.map((bet, key)=> {
           return(
@@ -98,6 +144,7 @@ class Betslip extends Component {
         <img style={{ width: "100%"}} src="dispute_outcome.png" />
         <CardMedia style={{ height: "200px" }} image="/court.png" />
         <div>
+          <BetPositions state={this.props.state}/>
         <List>
         {this.props.state.betslip.map((bet, key)=> {
           return(
