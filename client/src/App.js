@@ -18,6 +18,8 @@ import ConditionalTokens from './contracts/ConditionalTokens.json'
 
 const ipfs = require("nano-ipfs-store").at("https://ipfs.infura.io:5001");
 
+var ethers = require('ethers')
+
 const enc = new TextEncoder()
 
 let depositemitter = ""
@@ -52,7 +54,8 @@ class App extends Component {
       ct: null,
       positions: [],
       singleCollectionId: [],
-      singlePositionId: []
+      singlePositionId: [],
+      comboPositions: []
     }
     this.addEventData = this.addEventData.bind(this)
   }
@@ -156,9 +159,9 @@ class App extends Component {
 
   handleMint = (e) => {
     try{
-      this.state.currency.methods.mint(this.state.account,this.state.web3.utils.toWei('100')).send({from: this.state.account})
+      this.state.currency.methods.mint(this.state.account,this.state.web3.utils.toWei('1000')).send({from: this.state.account})
       .once('receipt', ((receipt) => {
-        console.log('100 USD minted')
+        console.log('1000 USD minted')
       }))
     } catch (err) {
       console.log('Error', err)
@@ -167,17 +170,17 @@ class App extends Component {
 
   handleApprove = (e) => {
     try{
-      this.state.currency.methods.approve(this.state.router._address,this.state.web3.utils.toWei('100')).send({from: this.state.account})
+      this.state.currency.methods.approve(this.state.router._address,this.state.web3.utils.toWei('1000')).send({from: this.state.account})
       .once('receipt', ((receipt) => {
-        console.log('100 USD allowance')
+        console.log('1000 USD allowance')
       }))
     } catch (err) {
       console.log('Error', err)
     }
     try{
-      this.state.currency.methods.approve(this.state.factory._address,this.state.web3.utils.toWei('100')).send({from: this.state.account})
+      this.state.currency.methods.approve(this.state.factory._address,this.state.web3.utils.toWei('1000')).send({from: this.state.account})
       .once('receipt', ((receipt) => {
-        console.log('100 USD allowance')
+        console.log('1000 USD allowance')
       }))
     } catch (err) {
       console.log('Error', err)
@@ -331,14 +334,17 @@ class App extends Component {
   async loadData() {
     const web3 = window.web3
     const accounts = await web3.eth.getAccounts()
+
+    const ethersprovider = new ethers.providers.Web3Provider(window.ethereum);
+
     this.setState({account: accounts[0]})
 
     this.setState({web3})
 
-    const factory = new web3.eth.Contract(FactoryContract.abi, '0x82d9E841f5db5eEA0311acec65339a3a63fd55B8')
+    const factory = new web3.eth.Contract(FactoryContract.abi, '0xe07Cc40A1cC8Aae61247199b5be8483da71501eB')
     this.setState({factory})
 
-    const currency = new web3.eth.Contract(FakeDai.abi, '0xF72B771dffa49a79cE0618aF3C2cCCe2d0C1620c')
+    const currency = new web3.eth.Contract(FakeDai.abi, '0x2eEff52e11d9fC15569185FE1f1B5dDc184D20b2')
     this.setState({currency})
 
     const balance = await currency.methods.balanceOf(this.state.account).call()
@@ -347,7 +353,7 @@ class App extends Component {
     const numEvents = await factory.methods.getNumberOfMarkets().call()
     this.setState({numberOfEvents: numEvents})
 
-    const router = new web3.eth.Contract(Router.abi, '0x6879429Ea3e1a9517e336521980c92cFA81669De')
+    const router = new web3.eth.Contract(Router.abi, '0xcaAb49eaAB4b76198349721443bd0593C63b0Ff1')
     this.setState({router})
 
     /*const arbitrator = new web3.eth.Contract(ArbitratorContract.abi,'0x91F95Fb01487490245502f0DA6CFaaAd0032B7dc')
@@ -362,8 +368,33 @@ class App extends Component {
 
     }*/
 
-    const ct = new web3.eth.Contract(ConditionalTokens.abi,'0x869dB603839d38c8E848c3559faeAc6D2a6104dF')
+    const ct = new web3.eth.Contract(ConditionalTokens.abi,'0xa5FB77460aB44df9AF15253c343ac92244367f24')
     this.setState({ct})
+
+    //let combos = await router.getPastEvents('ComboBetCreated', {fromBlock: 0, toBlock: 'latest'})
+    //Promise.all(combos.map(async (ev,ke) => {
+    //}))
+
+    const routerethers = new ethers.Contract('0xcaAb49eaAB4b76198349721443bd0593C63b0Ff1',Router.abi,ethersprovider)
+    let filter = routerethers.filters.ComboBetCreated(null,this.state.account,null,null,null)
+    let combobets = await routerethers.queryFilter(filter,0,100000)
+    Promise.all(combobets.map((combo,key) => {
+      var position = combo.args[2]._hex //positionId as hex
+      var eventarray = combo.args[0]
+      var outcomearray = combo.args[3]
+      var outcomearr = []
+      outcomearray.map((res,ke) => {
+        outcomearr.push(parseInt(res._hex))
+      })
+      var obj = {
+        addresses: eventarray,
+        outcomes: outcomearr,
+        position: position
+      }
+      this.setState({comboPositions: [...this.state.comboPositions, obj]})
+    }))
+
+    //console.log(routerethers.filters.ComboBetCreated(null))
 
     let tokens = await ct.getPastEvents('TransferSingle', {fromBlock: 0, toBlock: 'latest'})
     Promise.all(tokens.map(async (ev,ke) => {
@@ -516,7 +547,7 @@ class App extends Component {
     createeventemitter = this.state.factory.events.MarketCreated().on('data',(event,error) => {
       this.updateMarkets(event.returnValues._market)
     })
-    createbetemitter = this.state.router.events.BetCreated().on('data',(event,error) => {
+    createbetemitter = this.state.router.events.SingleBetCreated().on('data',(event,error) => {
       this.updatePrices(event.returnValues._event);
       //console.log(event.returnValues)
     })
@@ -538,7 +569,7 @@ class App extends Component {
           <Typography variant="h6" color="inherit" noWrap>
             Your balance: ${Number.parseFloat(this.state.web3.utils.fromWei(this.state.balance)).toFixed(2)}
           </Typography>
-          <Button colour="primary" type="submit" size="large" style = {{backgroundColor: "#FFFFFF", color : "#ED1C24"}}  variant="contained" component="span" onClick={this.handleMint}> Give me $100! </Button>
+          <Button colour="primary" type="submit" size="large" style = {{backgroundColor: "#FFFFFF", color : "#ED1C24"}}  variant="contained" component="span" onClick={this.handleMint}> Give me $1000! </Button>
           <Button colour="primary" type="submit" size="large" style = {{backgroundColor: "#FFFFFF", color : "#ED1C24"}}  variant="contained" component="span" onClick={this.handleApprove}> Approve All </Button>
           </div>
         </AppBar>

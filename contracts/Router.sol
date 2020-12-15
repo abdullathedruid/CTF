@@ -11,8 +11,8 @@ contract Router is IERC1155Receiver{
   address private currency;
   address private CT;
 
-  event BetCreated(address indexed _event, uint _outcome, int128 _amount);
-  event ComboBetCreated(address[] indexed _events, uint[] _outcomes, int128 _amount);
+  event SingleBetCreated(address _event, address indexed _user, uint _outcome, int128 _amount);
+  event ComboBetCreated(address[] _events, address indexed _user, uint256 indexed _id, uint[] _outcomes, int128 _amount);
 
   constructor(address _curr, address _ctf) public {
     currency = _curr;
@@ -23,7 +23,7 @@ contract Router is IERC1155Receiver{
     IERC20(currency).approve(_event,ABDKMath.mulu(_amount,10**18));
     int128 transfer = ISCMMaker(_event).buyshares(msg.sender,_outcome,_amount);
     require(IERC20(currency).transferFrom(msg.sender,address(this),ABDKMath.mulu(transfer,10**18)));
-    emit BetCreated(_event, _outcome, _amount);
+    emit SingleBetCreated(_event, msg.sender, _outcome, _amount);
   }
 
   function getInversePartition(uint256 index, uint256 len) public pure returns (uint256[] memory) {
@@ -48,8 +48,9 @@ contract Router is IERC1155Receiver{
       prevCollection = ConditionalTokens(CT).getCollectionId(prevCollection,ISCMMaker(_events[i]).getCondition(),_outcomes[i]);
     }
     require(IERC20(currency).transferFrom(msg.sender,address(this),ABDKMath.mulu(price,10**18)));
-    ConditionalTokens(CT).safeTransferFrom(address(this),msg.sender,ConditionalTokens(CT).getPositionId(IERC20(currency),prevCollection),ABDKMath.mulu(_amount,10**18),'');
-    emit ComboBetCreated(_events, _outcomes, _amount);
+    uint pos = ConditionalTokens(CT).getPositionId(IERC20(currency),prevCollection);
+    ConditionalTokens(CT).safeTransferFrom(address(this),msg.sender,pos,ABDKMath.mulu(_amount,10**18),'');
+    emit ComboBetCreated(_events, msg.sender, pos, _outcomes, _amount);
   }
 
   function getComboEventPrice(address[] memory _events, uint[] memory _outcomes, int128 _amount) public view returns (int128){

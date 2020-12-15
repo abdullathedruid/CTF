@@ -13,6 +13,8 @@ import CancelIcon from '@material-ui/icons/Cancel';
 import IconButton from '@material-ui/core/IconButton';
 import TextField from '@material-ui/core/TextField'
 
+var BN = require('ethers').BigNumber
+
 function parseOutcome(options,outcome) {
   var num = options.length
   var output = ""
@@ -30,6 +32,22 @@ function parseOutcome(options,outcome) {
   return output
 }
 
+function tryParseComboBet(state, id, amount) {
+  var output = ""
+  var eventarray = []
+  var outcomearray = []
+  state.comboPositions.map((comboPositions,koComboPositions) => {
+    if(BN.from(id).eq(BN.from(comboPositions.position))) {
+      eventarray = comboPositions.addresses
+      outcomearray = comboPositions.outcomes
+    }
+  })
+  eventarray.map((event,koEvent) => {
+    var index = state.eventData.map(function(o) {return o.address;}).indexOf(event)
+    output += state.eventData[index].title.toUpperCase()+"("+parseOutcome(state.eventData[index].options,outcomearray[koEvent])+") "
+  })
+  return "$"+amount+": "+output
+}
 
 class BetPositions extends Component {
   constructor(props) {
@@ -57,6 +75,12 @@ class BetPositions extends Component {
             return(
               <div>
               ${bet.amount}: {title}({outcome})
+              </div>
+            )
+          } else {
+            return(
+              <div>
+                {tryParseComboBet(this.props.state, bet.id, bet.amount)}
               </div>
             )
           }
