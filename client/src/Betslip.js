@@ -133,7 +133,7 @@ class Betslip extends Component {
             <ListItem>
               <Container>
               <IconButton color="primary" aria-label="upload picture" component="span" id={key} onClick={this.handleRemoveBet}>
-                <CancelIcon id={key}/>
+                <CancelIcon style = {{color: "#ED1C24"}} id={key}/>
               </IconButton>
               {this.props.state.eventData[this.props.state.eventData.map(function(o) {return o.address;}).indexOf(bet.event)].title}
               <div>
@@ -173,7 +173,7 @@ class Betslip extends Component {
             <ListItem>
               <Container>
               <IconButton color="primary" component="span" id={key} onClick={this.handleRemoveBet}>
-                <CancelIcon id={key}/>
+                <CancelIcon style = {{color: "#ED1C24"}} id={key}/>
               </IconButton>
               {this.props.state.eventData[this.props.state.eventData.map(function(o) {return o.address;}).indexOf(bet.event)].title}
               <div>
