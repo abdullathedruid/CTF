@@ -295,7 +295,25 @@ class App extends Component {
         }
   }
 
-  addEventData (address,title,description,question,options,endTime,resultTime, outcome, price, balances, state, owner) {
+  handleSingleClaim = (events,outcome) => {
+    var index = this.state.eventData.map(function(o) {return o.address;}).indexOf(events)
+    var outcomeArray = []
+    outcomeArray.push(outcome)
+    var curr = this.state.currency._address
+    var bytes0 = '0x0000000000000000000000000000000000000000000000000000000000000000'
+    var condition = this.state.eventData[index].condition
+    try{
+          this.state.ct.methods.redeemPositions(curr,bytes0,condition,outcomeArray).send({from: this.state.account})
+          .once('receipt', ((receipt) => {
+            console.log('Bet Redeemed')
+          }))
+        } catch (err) {
+          console.log('Error', err)
+        }
+    //function redeemPositions(IERC20 collateralToken, bytes32 parentCollectionId, bytes32 conditionId, uint[] calldata indexSets) external {
+  }
+
+  addEventData (address,title,description,question,options,endTime,resultTime, outcome, price, balances, state, owner,condition) {
     var obj = {
       address: address,
       title: title,
@@ -308,7 +326,8 @@ class App extends Component {
       price: price,
       balances: balances,
       state: state,
-      owner: owner
+      owner: owner,
+      condition: condition
     }
     this.setState({eventData: [...this.state.eventData, obj]})
   }
@@ -411,7 +430,9 @@ class App extends Component {
             id: ev.returnValues.id,
             amount: this.state.web3.utils.fromWei(await ct.methods.balanceOf(this.state.account,ev.returnValues.id).call())
           }
-          this.setState({positions: [...this.state.positions, obj]})
+          if(obj.amount>0) {
+            this.setState({positions: [...this.state.positions, obj]})
+          }
         }
       }
     }))
@@ -440,10 +461,12 @@ class App extends Component {
       let output = await ev.getPastEvents('MetaEvidence', {fromBlock: 0, toBlock: 'latest'})
       var metaevidence = output[0].returnValues._evidence;
 
+      let condition = await ev.methods.getCondition().call()
+
       //console.log('Loading file: ',metaevidence)
       let ipfs = await fetch('https://gateway.ipfs.io'+metaevidence)
       var responseJSON = await ipfs.json()
-      this.addEventData(addr,responseJSON.title, responseJSON.description, responseJSON.question, responseJSON.rulingOptions.descriptions,endTime,resultTime,outcome,price,balances,state,owner)
+      this.addEventData(addr,responseJSON.title, responseJSON.description, responseJSON.question, responseJSON.rulingOptions.descriptions,endTime,resultTime,outcome,price,balances,state,owner,condition)
       //console.log('Finished loading: ',metaevidence);
       if(i>=(numEvents-1)) {
         //console.log('loaded all data')
@@ -483,9 +506,11 @@ class App extends Component {
       let output = await ev.getPastEvents('MetaEvidence', {fromBlock: 0, toBlock: 'latest'})
       var metaevidence = output[0].returnValues._evidence;
 
+      let condition = await ev.methods.getCondition().call()
+
       let ipfs = await fetch('https://gateway.ipfs.io'+metaevidence)
       var responseJSON = await ipfs.json()
-      this.addEventData(addr,responseJSON.title, responseJSON.description, responseJSON.question, responseJSON.rulingOptions.descriptions,endTime,resultTime,outcome,price,balances,state,owner)
+      this.addEventData(addr,responseJSON.title, responseJSON.description, responseJSON.question, responseJSON.rulingOptions.descriptions,endTime,resultTime,outcome,price,balances,state,owner,condition)
     }
   }
 
@@ -593,7 +618,7 @@ class App extends Component {
         <Bets handleDispute={this.handleDispute} handleSetOutcome = {this.handleSetOutcome} handleOpenSetOutcome={this.handleOpenSetOutcome} handleCloseSetOutcome={this.handleCloseSetOutcome} handlePlaceBet={this.handlePlaceBet} handleChangePurchaseSize={this.handleChangePurchaseSize} state={this.state} openSetOutcome={this.state.openSetOutcome} open={this.state.openBet} handleClose={this.handleCloseBet} handleOpen={this.handleOpenBet}/>
       </Grid>
       <Grid item xs={4}>
-        <Betslip handleComboSubmit={this.handleComboSubmit} handleSingleSubmit={this.handleSingleSubmit} handleChangePurchaseSingleSize={this.handleChangePurchaseSingleSize} handleChangePurchaseComboSize={this.handleChangePurchaseComboSize} alterBet={this.alterBet} handleRemoveBet={this.handleRemoveBet} handleDisputeOutcome={this.handleDisputeOutcome} state={this.state}/>
+        <Betslip handleSingleClaim={this.handleSingleClaim} handleComboSubmit={this.handleComboSubmit} handleSingleSubmit={this.handleSingleSubmit} handleChangePurchaseSingleSize={this.handleChangePurchaseSingleSize} handleChangePurchaseComboSize={this.handleChangePurchaseComboSize} alterBet={this.alterBet} handleRemoveBet={this.handleRemoveBet} handleDisputeOutcome={this.handleDisputeOutcome} state={this.state}/>
       </Grid>
     </Grid>
     </main>

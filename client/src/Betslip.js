@@ -15,50 +15,74 @@ import TextField from '@material-ui/core/TextField'
 
 var BN = require('ethers').BigNumber
 
-function parseOutcome(options,outcome) {
-  var num = options.length
-  var output = ""
-  for(var i=0;i<num;i++) {
-    if((outcome & (1<<i)) == 0 ) {
-      continue
-    } else {
-      if(output=="") {
-        output = options[i]
-      } else {
-        output = output + "|" + options[i]
-      }
-    }
-  }
-  return output
-}
-
-function tryParseComboBet(state, id, amount) {
-  var output = ""
-  var eventarray = []
-  var outcomearray = []
-  state.comboPositions.map((comboPositions,koComboPositions) => {
-    if(BN.from(id).eq(BN.from(comboPositions.position))) {
-      eventarray = comboPositions.addresses
-      outcomearray = comboPositions.outcomes
-    }
-  })
-  eventarray.map((event,koEvent) => {
-    var index = state.eventData.map(function(o) {return o.address;}).indexOf(event)
-    output += state.eventData[index].title.toUpperCase()+"("+parseOutcome(state.eventData[index].options,outcomearray[koEvent])+") "
-  })
-  return (
-      <div>${amount}: {output}</div>
-    )
-}
+const haha = 'HAHA'
 
 class BetPositions extends Component {
   constructor(props) {
     super()
   }
+
+  handleSingleClaim = (events,outcome) => {
+    this.props.handleSingleClaim(events,outcome)
+  }
+  //function redeemPositions(IERC20 collateralToken, bytes32 parentCollectionId, bytes32 conditionId, uint[] calldata indexSets) external {
+
+  parseOutcome(options,outcome) {
+    var num = options.length
+    var output = ""
+    for(var i=0;i<num;i++) {
+      if((outcome & (1<<i)) == 0 ) {
+        continue
+      } else {
+        if(output=="") {
+          output = options[i]
+        } else {
+          output = output + "|" + options[i]
+        }
+      }
+    }
+    return output
+  }
+
+  parseRedeemButtonSingle(outcome,position,events) {
+    if(outcome == 0) {
+      return (<Button>🟡 pending</Button>)
+    } else {
+      if(outcome == position) {
+        return (<Button onClick={() => this.handleSingleClaim(events,position)}>🟢 Claim</Button>)
+      } else {
+        return (<Button>🔴 Lost bet</Button>)
+      }
+    }
+  }
+
+  parseRedeemButtonCombo() {
+    return ("hi")
+  }
+
+  tryParseComboBet(state, id, amount) {
+    var output = ""
+    var eventarray = []
+    var outcomearray = []
+    state.comboPositions.map((comboPositions,koComboPositions) => {
+      if(BN.from(id).eq(BN.from(comboPositions.position))) {
+        eventarray = comboPositions.addresses
+        outcomearray = comboPositions.outcomes
+      }
+    })
+    eventarray.map((event,koEvent) => {
+      var index = state.eventData.map(function(o) {return o.address;}).indexOf(event)
+      output += state.eventData[index].title.toUpperCase()+"("+this.parseOutcome(state.eventData[index].options,outcomearray[koEvent])+") "
+    })
+    return (
+        <div>${amount}: {output}</div>
+      )
+  }
+
   render() {
     return(
       <div>
-        Your Positions:
+        Your Active Positions:
         {this.props.state.positions.map((bet,key) => {
           var betevent = -1
           var betoutcome = -1
@@ -73,14 +97,14 @@ class BetPositions extends Component {
           if(betevent!=-1) {
             var i =this.props.state.eventData.map(function(o) {return o.address;}).indexOf(betevent)
             var title = this.props.state.eventData[i].title
-            var outcome = parseOutcome(this.props.state.eventData[i].options,betoutcome)
+            var outcome = this.parseOutcome(this.props.state.eventData[i].options,betoutcome)
             return(
               <div>
-              ${bet.amount}: {title}({outcome})
+              ${bet.amount}: {title}({outcome}) {this.parseRedeemButtonSingle(this.props.state.eventData[i].outcome,betoutcome,this.props.state.eventData[i].address)}
               </div>
             )
           } else {
-            {return(tryParseComboBet(this.props.state, bet.id, bet.amount))}
+            {return(this.tryParseComboBet(this.props.state, bet.id, bet.amount))} {return(this.parseRedeemButtonCombo())}
           }
         })}
       </div>
@@ -126,7 +150,7 @@ class Betslip extends Component {
         <img style={{ width: "100%"}} src="dispute_outcome.png" />
         <CardMedia style={{ height: "200px" }} image="/court.png" />
         <div>
-          <BetPositions state={this.props.state} />
+          <BetPositions handleSingleClaim={this.props.handleSingleClaim} state={this.props.state} />
         <List>
         {this.props.state.betslip.map((bet, key)=> {
           return(
@@ -137,7 +161,7 @@ class Betslip extends Component {
               </IconButton>
               {this.props.state.eventData[this.props.state.eventData.map(function(o) {return o.address;}).indexOf(bet.event)].title}
               <div>
-                <ButtonGroup color="primary" >
+                <ButtonGroup color="primary">
                 {this.props.state.eventData[this.props.state.eventData.map(function(o) {return o.address;}).indexOf(bet.event)].price.map((p,k) => {
                   return(
                     <Button onClick={e => this.alterBet(e,k,key)}
@@ -172,8 +196,8 @@ class Betslip extends Component {
           return(
             <ListItem>
               <Container>
-              <IconButton color="primary" component="span" id={key} onClick={this.handleRemoveBet}>
-                <CancelIcon style = {{color: "#ED1C24"}} id={key}/>
+              <IconButton color="primary" style={{"border-color": "#ED1C24"}} component="span" id={key} onClick={this.handleRemoveBet}>
+                <CancelIcon id={key}/>
               </IconButton>
               {this.props.state.eventData[this.props.state.eventData.map(function(o) {return o.address;}).indexOf(bet.event)].title}
               <div>

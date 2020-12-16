@@ -60,8 +60,6 @@ class BetCard extends Component {
 
   renderSetOutcome(account,eventowner,resultTime,outcome,kid) {
     let timestamp = (Date.now())/1000
-    console.log(account)
-    console.log(eventowner)
     if((timestamp > resultTime) && account==eventowner && outcome==0) {
       return(<ListItem button id={kid} label="Set Outcome" onClick={this.handleOpenSetOutcome} >Set outcome</ListItem>)
     } else {
