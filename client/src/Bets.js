@@ -145,7 +145,6 @@ class Bets extends Component {
       return(
         <Container>
           <img style={{ width: "100%"}} src="active_markets.png" />
-          <CardMedia style={{ height: "200px" }} image="/market2.jpg" />
           <div> No events </div>
         </Container>
       )
@@ -167,7 +166,6 @@ class Bets extends Component {
         </List>
         </Dialog>
         <img style={{ width: "100%"}} src="active_markets.png" />
-        <CardMedia style={{ height: "200px" }} image="/market2.jpg" />
         <div>
         {
           this.props.state.eventData.map((bet,key) => {

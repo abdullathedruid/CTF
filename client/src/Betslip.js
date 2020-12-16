@@ -15,6 +15,12 @@ import TextField from '@material-ui/core/TextField'
 
 var BN = require('ethers').BigNumber
 
+let audio = new Audio("combobreaker.mp3")
+
+const start = () => {
+  audio.play()
+}
+
 const haha = 'HAHA'
 
 class BetPositions extends Component {
@@ -176,16 +182,14 @@ class Betslip extends Component {
     if(this.props.state.betslip.length==0) {
       return(
         <Container>
-        <img style={{ width: "100%"}} src="dispute_outcome.png" />
-        <CardMedia style={{ height: "200px" }} image="/court.png" />
+        <img style={{ width: "100%"}} src="cb2.png" />
           <BetPositions state={this.props.state} />
         </Container>
       )
     } else if(this.props.state.betslip.length==1) {
       return(
         <Container>
-        <img style={{ width: "100%"}} src="dispute_outcome.png" />
-        <CardMedia style={{ height: "200px" }} image="/court.png" />
+        <img style={{ width: "100%"}} src="cb2.png" />
         <div>
           <BetPositions handleSingleClaim={this.props.handleSingleClaim} state={this.props.state} />
         <List>
@@ -216,7 +220,12 @@ class Betslip extends Component {
         <div>
           <TextField label="Outcome tokens to buy" fullWidth value={this.props.state.quotedAmount} onChange={this.props.handleChangePurchaseSingleSize}></TextField>
           <TextField label="Price" fullWidth value={this.props.state.quotedPrice}></TextField>
-          <Button colour="primary" onClick={this.props.handleSingleSubmit} type="submit" size="large" style = {{backgroundColor: "#ED1C24", color : "#FFFFFF"}}  variant="contained" component="span" > Submit single bet </Button>
+          <Button colour="primary" onClick={
+            () => {
+          start();
+          this.props.handleSingleSubmit();
+        }
+            } type="submit" size="large" style = {{backgroundColor: "#ED1C24", color : "#FFFFFF"}}  variant="contained" component="span" > Submit single bet </Button>
         </div>
 
         </Container>
@@ -224,8 +233,7 @@ class Betslip extends Component {
     } else {
       return(
         <Container>
-        <img style={{ width: "100%"}} src="dispute_outcome.png" />
-        <CardMedia style={{ height: "200px" }} image="/court.png" />
+        <img style={{ width: "100%"}} src="cb2.png" />
         <div>
           <BetPositions state={this.props.state}/>
         <List>

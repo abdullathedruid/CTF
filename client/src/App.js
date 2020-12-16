@@ -26,6 +26,7 @@ let depositemitter = ""
 let createeventemitter = ""
 let createbetemitter = ""
 
+
 class App extends Component {
 
   constructor() {
@@ -362,10 +363,10 @@ class App extends Component {
 
     this.setState({web3})
 
-    var currencyaddress = '0xbDfd119600Ce7b9A55c5E0dc8F00e41a02348FEC'
-    var ctaddress = '0x6E9291C90F81e7A952798AE4Cd34D5636976bB70'
-    var factoryaddress = '0x5b1C17EF3904E98778BDf7dFE465fdf478aE902D'
-    var routeraddress = '0x1015B5e7E92D19a90d68cFab9F5a8f315CA002Ea'
+    var currencyaddress = '0x5C9F81D6C578E7Ff376DDDE33612718D6F28D7ac'
+    var ctaddress = '0x9C0F6d42A275035e285add4BE195f13ec8d14534'
+    var factoryaddress = '0x18577AcA3eFc697Cc91D85b965B04994f24522A1'
+    var routeraddress = '0x5CD363d4363AbAFf407c6E3bD640E7823Aa2faad'
 
 
     const factory = new web3.eth.Contract(FactoryContract.abi, factoryaddress)
@@ -602,7 +603,9 @@ class App extends Component {
           <Typography variant="h6" noWrap>
             Your balance: ${Number.parseFloat(this.state.web3.utils.fromWei(this.state.balance)).toFixed(2)}
           </Typography>
-          <Button colour="primary" type="submit" size="large" style = {{backgroundColor: "#FFFFFF", color : "#ED1C24"}}  variant="contained" component="span" onClick={this.handleMint}> Give me $1000! </Button>
+          <Button colour="primary" type="submit" size="large" style = {{backgroundColor: "#FFFFFF", color : "#ED1C24"}}  variant="contained" component="span" onClick={() => {
+          this.handleMint();
+        }}> Give me $1000! </Button>
           <Button colour="primary" type="submit" size="large" style = {{backgroundColor: "#FFFFFF", color : "#ED1C24"}}  variant="contained" component="span" onClick={this.handleApprove}> Approve All </Button>
           </div>
         </AppBar>
