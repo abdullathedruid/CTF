@@ -36,19 +36,34 @@ class BetCard extends Component {
     }
   }
 
-  renderOutcome(resultTime,outcome) {
+  renderOutcome(resultTime,outcome,options) {
     let timestamp = (Date.now())/1000
     if(timestamp > resultTime) {
-      return(<Typography> Outcome: {outcome} </Typography>)
+      if(outcome == 0) {
+        return(<Typography> Waiting for outcome to be set..</Typography>)
+      } else {
+        return(<Typography> Outcome: {options[(outcome>>1)]} </Typography>)
+      }
     } else {
       return ''
     }
   }
 
-  renderSetOutcome(resultTime,kid) {
+  renderBettingTime(endTime) {
     let timestamp = (Date.now())/1000
-    if(timestamp > resultTime) {
-      return(<ListItem button id={kid} label="Set Outcome" onClick={this.handleOpenSetOutcome} >Set outcome (Only GAMEMASTER)</ListItem>)
+    if(timestamp > endTime) {
+      return(<Typography>Betting finished.</Typography>)
+    } else {
+      return(<Typography>End of betting: {returnFormattedTime(endTime)}</Typography>)
+    }
+  }
+
+  renderSetOutcome(account,eventowner,resultTime,outcome,kid) {
+    let timestamp = (Date.now())/1000
+    console.log(account)
+    console.log(eventowner)
+    if((timestamp > resultTime) && account==eventowner && outcome==0) {
+      return(<ListItem button id={kid} label="Set Outcome" onClick={this.handleOpenSetOutcome} >Set outcome</ListItem>)
     } else {
       return ''
     }
@@ -57,7 +72,7 @@ class BetCard extends Component {
   renderDisputeAnswer(resultTime,kid) {
     let timestamp = (Date.now())/1000
     if(timestamp > resultTime) {
-      return(<ListItem button id={kid} onClick={this.handleDispute}>Dispute Answer</ListItem>)
+      return ''//return(<ListItem button id={kid}>Dispute Answer (Disabled for test)</ListItem>)
     } else {
       return ''
     }
@@ -99,10 +114,10 @@ class BetCard extends Component {
         })
       }
       </List>
-      {this.renderOutcome(eventData.resultTime,eventData.outcome)}
-      <Typography>Betting finishes: {returnFormattedTime(eventData.endTime)}</Typography>
+      {this.renderOutcome(eventData.resultTime,eventData.outcome,eventData.options)}
+      {this.renderBettingTime(eventData.endTime)}
       <List>
-      {this.renderSetOutcome(eventData.resultTime,this.props.id)}
+      {this.renderSetOutcome(this.props.state.account,eventData.owner,eventData.resultTime,eventData.outcome,this.props.id)}
       {this.renderDisputeAnswer(eventData.resultTime,this.props.id)}
       {this.renderClaimReward(eventData.state)}
       </List>

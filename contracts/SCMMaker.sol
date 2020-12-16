@@ -97,8 +97,8 @@ contract SCMMaker is IArbitrable, IEvidence, ISCMMaker, IERC1155Receiver{
         resultTimestamp = endTime;
         emit MetaEvidence(0,hash);
         CT = ConditionalTokens(_ct);
-        CT.prepareCondition(_owner,bytes32(uint256(address(this)) << 96),_numOptions);
-        condition = CT.getConditionId(_owner,bytes32(uint256(address(this)) << 96),_numOptions);
+        CT.prepareCondition(address(this),bytes32(uint256(address(this)) << 96),_numOptions);
+        condition = CT.getConditionId(address(this),bytes32(uint256(address(this)) << 96),_numOptions);
     }
     //The function is now initialised with liquidity split across all outcomes
 
@@ -153,6 +153,10 @@ contract SCMMaker is IArbitrable, IEvidence, ISCMMaker, IERC1155Receiver{
 
     function getIndexSet(uint _set) public pure returns (uint) {
       return 1<<_set;
+    }
+
+    function getOwner() public view returns (address) {
+      return game_master;
     }
 
     function getInversePartition(uint256 index, uint256 len) public pure returns (uint256[] memory) {
@@ -229,6 +233,16 @@ contract SCMMaker is IArbitrable, IEvidence, ISCMMaker, IERC1155Receiver{
       ORACLE FUNCTIONS
     */
 
+    function getPayoutMatrix(uint _outcomes, uint _n) private pure returns (uint[] memory) {
+        uint[] memory matrix = new uint[](_n);
+        for(uint i=0;i<_n;i++) {
+          if((_outcomes & 1<<i) != 0) {
+            matrix[i] = 1;
+          }
+        }
+        return matrix;
+    }
+
     function setOutcome(uint _outcome) public {
         require(status != Status.Disputed,"DECISION GONE TO KLEROS");
         require(msg.sender == game_master,"ONLY MASTER CAN CALL");
@@ -239,6 +253,7 @@ contract SCMMaker is IArbitrable, IEvidence, ISCMMaker, IERC1155Receiver{
         outcome = _outcome;
         status = Status.Appealable;
         appealTimestamp = block.timestamp + DISPUTE_TIME;
+        ConditionalTokens(CT).reportPayouts(bytes32(uint256(address(this)) << 96),getPayoutMatrix(_outcome,numOfOutcomes));
     }
 
     function disputeOutcome() public payable {
