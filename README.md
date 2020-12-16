@@ -1,4 +1,4 @@
-# C-C-Combobreaker
+# PROJECT C-C-COMBOBREAKER
 
 <center>
 ![image](funky_owl.png)
@@ -32,6 +32,8 @@ The aim is to price and make possible any sort of combination. For example:
 - All 3 outcomes of 3 bets occur.
 - At least 2 out of 3 outcomes occur.
 - At least 1  out of the 3 outcomes occur.
+
+
 
 ## For future reference
 
