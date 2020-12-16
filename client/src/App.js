@@ -80,8 +80,9 @@ class App extends Component {
     await this.loadData()
     this.listenForEvents()
     await this.getAllSingleCollectionIds()
-    .then(() => {
-      this.getAllSinglePositionIds()
+    .then(async () => {
+      await this.getAllSinglePositionIds()
+      this.setState({loading: false})
     })
   }
 
@@ -124,7 +125,7 @@ class App extends Component {
   handleSetOutcome = (e,x) => {
     console.log(`Attempting to set outcome [${x}] for event [${this.state.openSetOutcomeBet}]`)
     try{
-      this.state.event[this.state.openSetOutcomeBet].methods.setOutcome(x).send({from: this.state.account})
+      this.state.event[this.state.openSetOutcomeBet].methods.setOutcome(2**x).send({from: this.state.account})
       .once('receipt', ((receipt) => {
         console.log('Outcome has been set')
         this.setState({openSetOutcome: false})
@@ -294,7 +295,25 @@ class App extends Component {
         }
   }
 
-  addEventData (address,title,description,question,options,endTime,resultTime, outcome, price, balances, state) {
+  handleSingleClaim = (events,outcome) => {
+    var index = this.state.eventData.map(function(o) {return o.address;}).indexOf(events)
+    var outcomeArray = []
+    outcomeArray.push(outcome)
+    var curr = this.state.currency._address
+    var bytes0 = '0x0000000000000000000000000000000000000000000000000000000000000000'
+    var condition = this.state.eventData[index].condition
+    try{
+          this.state.ct.methods.redeemPositions(curr,bytes0,condition,outcomeArray).send({from: this.state.account})
+          .once('receipt', ((receipt) => {
+            console.log('Bet Redeemed')
+          }))
+        } catch (err) {
+          console.log('Error', err)
+        }
+    //function redeemPositions(IERC20 collateralToken, bytes32 parentCollectionId, bytes32 conditionId, uint[] calldata indexSets) external {
+  }
+
+  addEventData (address,title,description,question,options,endTime,resultTime, outcome, price, balances, state, owner,condition) {
     var obj = {
       address: address,
       title: title,
@@ -306,7 +325,9 @@ class App extends Component {
       outcome: outcome,
       price: price,
       balances: balances,
-      state: state
+      state: state,
+      owner: owner,
+      condition: condition
     }
     this.setState({eventData: [...this.state.eventData, obj]})
   }
@@ -341,10 +362,16 @@ class App extends Component {
 
     this.setState({web3})
 
-    const factory = new web3.eth.Contract(FactoryContract.abi, '0xe07Cc40A1cC8Aae61247199b5be8483da71501eB')
+    var currencyaddress = '0xbDfd119600Ce7b9A55c5E0dc8F00e41a02348FEC'
+    var ctaddress = '0x6E9291C90F81e7A952798AE4Cd34D5636976bB70'
+    var factoryaddress = '0x5b1C17EF3904E98778BDf7dFE465fdf478aE902D'
+    var routeraddress = '0x1015B5e7E92D19a90d68cFab9F5a8f315CA002Ea'
+
+
+    const factory = new web3.eth.Contract(FactoryContract.abi, factoryaddress)
     this.setState({factory})
 
-    const currency = new web3.eth.Contract(FakeDai.abi, '0x2eEff52e11d9fC15569185FE1f1B5dDc184D20b2')
+    const currency = new web3.eth.Contract(FakeDai.abi, currencyaddress)
     this.setState({currency})
 
     const balance = await currency.methods.balanceOf(this.state.account).call()
@@ -353,12 +380,12 @@ class App extends Component {
     const numEvents = await factory.methods.getNumberOfMarkets().call()
     this.setState({numberOfEvents: numEvents})
 
-    const router = new web3.eth.Contract(Router.abi, '0xcaAb49eaAB4b76198349721443bd0593C63b0Ff1')
+    const router = new web3.eth.Contract(Router.abi, routeraddress)
     this.setState({router})
 
     /*
     //This is the arbitrator code for the kleros hackathon
-    //Don't need to deploy it for CTF 
+    //Don't need to deploy it for CTF
     const arbitrator = new web3.eth.Contract(ArbitratorContract.abi,'0x91F95Fb01487490245502f0DA6CFaaAd0032B7dc')
     this.setState({arbitrator})
 
@@ -371,13 +398,13 @@ class App extends Component {
 
     }*/
 
-    const ct = new web3.eth.Contract(ConditionalTokens.abi,'0xa5FB77460aB44df9AF15253c343ac92244367f24')
+    const ct = new web3.eth.Contract(ConditionalTokens.abi,ctaddress)
     this.setState({ct})
 
     //This won't work on web3 because of some overflow issue but it works with ethers. How odd
-    const routerethers = new ethers.Contract('0xcaAb49eaAB4b76198349721443bd0593C63b0Ff1',Router.abi,ethersprovider)
+    const routerethers = new ethers.Contract(routeraddress,Router.abi,ethersprovider)
     let filter = routerethers.filters.ComboBetCreated(null,this.state.account,null,null,null)
-    let combobets = await routerethers.queryFilter(filter,0,100000)
+    let combobets = await routerethers.queryFilter(filter,0,await ethersprovider.getBlockNumber())
     Promise.all(combobets.map((combo,key) => {
       var position = combo.args[2]._hex
       var eventarray = combo.args[0]
@@ -403,7 +430,9 @@ class App extends Component {
             id: ev.returnValues.id,
             amount: this.state.web3.utils.fromWei(await ct.methods.balanceOf(this.state.account,ev.returnValues.id).call())
           }
-          this.setState({positions: [...this.state.positions, obj]})
+          if(obj.amount>0) {
+            this.setState({positions: [...this.state.positions, obj]})
+          }
         }
       }
     }))
@@ -424,20 +453,24 @@ class App extends Component {
       var endTime = await ev.methods.endTimestamp().call()
       var resultTime = await ev.methods.resultTimestamp().call()
 
+      var owner = await ev.methods.getOwner().call()
+
       var state = await ev.methods.status().call()
 
 
       let output = await ev.getPastEvents('MetaEvidence', {fromBlock: 0, toBlock: 'latest'})
       var metaevidence = output[0].returnValues._evidence;
 
+      let condition = await ev.methods.getCondition().call()
+
       //console.log('Loading file: ',metaevidence)
       let ipfs = await fetch('https://gateway.ipfs.io'+metaevidence)
       var responseJSON = await ipfs.json()
-      this.addEventData(addr,responseJSON.title, responseJSON.description, responseJSON.question, responseJSON.rulingOptions.descriptions,endTime,resultTime,outcome,price,balances,state)
+      this.addEventData(addr,responseJSON.title, responseJSON.description, responseJSON.question, responseJSON.rulingOptions.descriptions,endTime,resultTime,outcome,price,balances,state,owner,condition)
       //console.log('Finished loading: ',metaevidence);
       if(i>=(numEvents-1)) {
         //console.log('loaded all data')
-        this.setState({loading: false})
+        //this.setState({loading: false})
       }
     }
 
@@ -467,13 +500,17 @@ class App extends Component {
       var endTime = await ev.methods.endTimestamp().call()
       var resultTime = await ev.methods.resultTimestamp().call()
 
+      var owner = await ev.methods.getOwner().call()
+
       var state = await ev.methods.status().call()
       let output = await ev.getPastEvents('MetaEvidence', {fromBlock: 0, toBlock: 'latest'})
       var metaevidence = output[0].returnValues._evidence;
 
+      let condition = await ev.methods.getCondition().call()
+
       let ipfs = await fetch('https://gateway.ipfs.io'+metaevidence)
       var responseJSON = await ipfs.json()
-      this.addEventData(addr,responseJSON.title, responseJSON.description, responseJSON.question, responseJSON.rulingOptions.descriptions,endTime,resultTime,outcome,price,balances,state)
+      this.addEventData(addr,responseJSON.title, responseJSON.description, responseJSON.question, responseJSON.rulingOptions.descriptions,endTime,resultTime,outcome,price,balances,state,owner,condition)
     }
   }
 
@@ -558,11 +595,11 @@ class App extends Component {
       <header>
         <AppBar position="static" style = {{backgroundColor: "#ED1C24"}} >
           <img style={{ width: "50%" }} src="supreme_header.png" />
-          <Typography variant="h6" color="inherit" noWrap>
+          <Typography variant="h6" noWrap>
             Your address: {this.state.account}
           </Typography>
           <div>
-          <Typography variant="h6" color="inherit" noWrap>
+          <Typography variant="h6" noWrap>
             Your balance: ${Number.parseFloat(this.state.web3.utils.fromWei(this.state.balance)).toFixed(2)}
           </Typography>
           <Button colour="primary" type="submit" size="large" style = {{backgroundColor: "#FFFFFF", color : "#ED1C24"}}  variant="contained" component="span" onClick={this.handleMint}> Give me $1000! </Button>
@@ -581,7 +618,7 @@ class App extends Component {
         <Bets handleDispute={this.handleDispute} handleSetOutcome = {this.handleSetOutcome} handleOpenSetOutcome={this.handleOpenSetOutcome} handleCloseSetOutcome={this.handleCloseSetOutcome} handlePlaceBet={this.handlePlaceBet} handleChangePurchaseSize={this.handleChangePurchaseSize} state={this.state} openSetOutcome={this.state.openSetOutcome} open={this.state.openBet} handleClose={this.handleCloseBet} handleOpen={this.handleOpenBet}/>
       </Grid>
       <Grid item xs={4}>
-        <Betslip handleComboSubmit={this.handleComboSubmit} handleSingleSubmit={this.handleSingleSubmit} handleChangePurchaseSingleSize={this.handleChangePurchaseSingleSize} handleChangePurchaseComboSize={this.handleChangePurchaseComboSize} alterBet={this.alterBet} handleRemoveBet={this.handleRemoveBet} handleDisputeOutcome={this.handleDisputeOutcome} state={this.state}/>
+        <Betslip handleSingleClaim={this.handleSingleClaim} handleComboSubmit={this.handleComboSubmit} handleSingleSubmit={this.handleSingleSubmit} handleChangePurchaseSingleSize={this.handleChangePurchaseSingleSize} handleChangePurchaseComboSize={this.handleChangePurchaseComboSize} alterBet={this.alterBet} handleRemoveBet={this.handleRemoveBet} handleDisputeOutcome={this.handleDisputeOutcome} state={this.state}/>
       </Grid>
     </Grid>
     </main>

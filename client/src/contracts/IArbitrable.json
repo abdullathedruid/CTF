@@ -57,15 +57,15 @@
     "absolutePath": "/C/Users/Abdulla/apps/CTF/contracts/interfaces/IArbitrable.sol",
     "exportedSymbols": {
       "IArbitrable": [
-        6328
+        6416
       ]
     },
-    "id": 6329,
+    "id": 6417,
     "license": "MIT",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 6308,
+        "id": 6396,
         "literals": [
           "solidity",
           ">=",
@@ -77,10 +77,10 @@
       {
         "absolutePath": "/C/Users/Abdulla/apps/CTF/contracts/interfaces/IArbitrator.sol",
         "file": "./IArbitrator.sol",
-        "id": 6309,
+        "id": 6397,
         "nodeType": "ImportDirective",
-        "scope": 6329,
-        "sourceUnit": 6421,
+        "scope": 6417,
+        "sourceUnit": 6509,
         "src": "194:27:8",
         "symbolAliases": [],
         "unitAlias": ""
@@ -91,15 +91,15 @@
         "contractDependencies": [],
         "contractKind": "interface",
         "documentation": {
-          "id": 6310,
+          "id": 6398,
           "nodeType": "StructuredDocumentation",
           "src": "225:304:8",
           "text": "@title IArbitrable\nArbitrable interface.\nWhen developing arbitrable contracts, we need to:\n- Define the action taken when a ruling is received by the contract.\n- Allow dispute creation. For this a function must call arbitrator.createDispute{value: _fee}(_choices,_extraData);"
         },
         "fullyImplemented": false,
-        "id": 6328,
+        "id": 6416,
         "linearizedBaseContracts": [
-          6328
+          6416
         ],
         "name": "IArbitrable",
         "nodeType": "ContractDefinition",
@@ -107,43 +107,43 @@
           {
             "anonymous": false,
             "documentation": {
-              "id": 6311,
+              "id": 6399,
               "nodeType": "StructuredDocumentation",
               "src": "560:246:8",
               "text": "@dev To be raised when a ruling is given.\n@param _arbitrator The arbitrator giving the ruling.\n@param _disputeID ID of the dispute in the Arbitrator contract.\n@param _ruling The ruling which was given."
             },
-            "id": 6319,
+            "id": 6407,
             "name": "Ruling",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 6318,
+              "id": 6406,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 6313,
+                  "id": 6401,
                   "indexed": true,
                   "mutability": "mutable",
                   "name": "_arbitrator",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 6319,
+                  "scope": 6407,
                   "src": "825:31:8",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_contract$_IArbitrator_$6420",
+                    "typeIdentifier": "t_contract$_IArbitrator_$6508",
                     "typeString": "contract IArbitrator"
                   },
                   "typeName": {
                     "contractScope": null,
-                    "id": 6312,
+                    "id": 6400,
                     "name": "IArbitrator",
                     "nodeType": "UserDefinedTypeName",
-                    "referencedDeclaration": 6420,
+                    "referencedDeclaration": 6508,
                     "src": "825:11:8",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_IArbitrator_$6420",
+                      "typeIdentifier": "t_contract$_IArbitrator_$6508",
                       "typeString": "contract IArbitrator"
                     }
                   },
@@ -152,13 +152,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 6315,
+                  "id": 6403,
                   "indexed": true,
                   "mutability": "mutable",
                   "name": "_disputeID",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 6319,
+                  "scope": 6407,
                   "src": "858:26:8",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -167,7 +167,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 6314,
+                    "id": 6402,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "858:7:8",
@@ -181,13 +181,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 6317,
+                  "id": 6405,
                   "indexed": false,
                   "mutability": "mutable",
                   "name": "_ruling",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 6319,
+                  "scope": 6407,
                   "src": "886:15:8",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -196,7 +196,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 6316,
+                    "id": 6404,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "886:7:8",
@@ -216,13 +216,13 @@
           {
             "body": null,
             "documentation": {
-              "id": 6320,
+              "id": 6408,
               "nodeType": "StructuredDocumentation",
               "src": "911:399:8",
               "text": "@dev Give a ruling for a dispute. Must be called by the arbitrator.\nThe purpose of this function is to ensure that the address calling it has the right to rule on the contract.\n@param _disputeID ID of the dispute in the Arbitrator contract.\n@param _ruling Ruling given by the arbitrator. Note that 0 is reserved for \"Not able/wanting to make a decision\"."
             },
             "functionSelector": "311a6c56",
-            "id": 6327,
+            "id": 6415,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -230,17 +230,17 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 6325,
+              "id": 6413,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 6322,
+                  "id": 6410,
                   "mutability": "mutable",
                   "name": "_disputeID",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 6327,
+                  "scope": 6415,
                   "src": "1330:18:8",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -249,7 +249,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 6321,
+                    "id": 6409,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "1330:7:8",
@@ -263,12 +263,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 6324,
+                  "id": 6412,
                   "mutability": "mutable",
                   "name": "_ruling",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 6327,
+                  "scope": 6415,
                   "src": "1350:15:8",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -277,7 +277,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 6323,
+                    "id": 6411,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "1350:7:8",
@@ -293,19 +293,19 @@
               "src": "1329:37:8"
             },
             "returnParameters": {
-              "id": 6326,
+              "id": 6414,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "1375:0:8"
             },
-            "scope": 6328,
+            "scope": 6416,
             "src": "1316:60:8",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 6329,
+        "scope": 6417,
         "src": "531:848:8"
       }
     ],
@@ -315,15 +315,15 @@
     "absolutePath": "/C/Users/Abdulla/apps/CTF/contracts/interfaces/IArbitrable.sol",
     "exportedSymbols": {
       "IArbitrable": [
-        6328
+        6416
       ]
     },
-    "id": 6329,
+    "id": 6417,
     "license": "MIT",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 6308,
+        "id": 6396,
         "literals": [
           "solidity",
           ">=",
@@ -335,10 +335,10 @@
       {
         "absolutePath": "/C/Users/Abdulla/apps/CTF/contracts/interfaces/IArbitrator.sol",
         "file": "./IArbitrator.sol",
-        "id": 6309,
+        "id": 6397,
         "nodeType": "ImportDirective",
-        "scope": 6329,
-        "sourceUnit": 6421,
+        "scope": 6417,
+        "sourceUnit": 6509,
         "src": "194:27:8",
         "symbolAliases": [],
         "unitAlias": ""
@@ -349,15 +349,15 @@
         "contractDependencies": [],
         "contractKind": "interface",
         "documentation": {
-          "id": 6310,
+          "id": 6398,
           "nodeType": "StructuredDocumentation",
           "src": "225:304:8",
           "text": "@title IArbitrable\nArbitrable interface.\nWhen developing arbitrable contracts, we need to:\n- Define the action taken when a ruling is received by the contract.\n- Allow dispute creation. For this a function must call arbitrator.createDispute{value: _fee}(_choices,_extraData);"
         },
         "fullyImplemented": false,
-        "id": 6328,
+        "id": 6416,
         "linearizedBaseContracts": [
-          6328
+          6416
         ],
         "name": "IArbitrable",
         "nodeType": "ContractDefinition",
@@ -365,43 +365,43 @@
           {
             "anonymous": false,
             "documentation": {
-              "id": 6311,
+              "id": 6399,
               "nodeType": "StructuredDocumentation",
               "src": "560:246:8",
               "text": "@dev To be raised when a ruling is given.\n@param _arbitrator The arbitrator giving the ruling.\n@param _disputeID ID of the dispute in the Arbitrator contract.\n@param _ruling The ruling which was given."
             },
-            "id": 6319,
+            "id": 6407,
             "name": "Ruling",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 6318,
+              "id": 6406,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 6313,
+                  "id": 6401,
                   "indexed": true,
                   "mutability": "mutable",
                   "name": "_arbitrator",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 6319,
+                  "scope": 6407,
                   "src": "825:31:8",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_contract$_IArbitrator_$6420",
+                    "typeIdentifier": "t_contract$_IArbitrator_$6508",
                     "typeString": "contract IArbitrator"
                   },
                   "typeName": {
                     "contractScope": null,
-                    "id": 6312,
+                    "id": 6400,
                     "name": "IArbitrator",
                     "nodeType": "UserDefinedTypeName",
-                    "referencedDeclaration": 6420,
+                    "referencedDeclaration": 6508,
                     "src": "825:11:8",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_IArbitrator_$6420",
+                      "typeIdentifier": "t_contract$_IArbitrator_$6508",
                       "typeString": "contract IArbitrator"
                     }
                   },
@@ -410,13 +410,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 6315,
+                  "id": 6403,
                   "indexed": true,
                   "mutability": "mutable",
                   "name": "_disputeID",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 6319,
+                  "scope": 6407,
                   "src": "858:26:8",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -425,7 +425,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 6314,
+                    "id": 6402,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "858:7:8",
@@ -439,13 +439,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 6317,
+                  "id": 6405,
                   "indexed": false,
                   "mutability": "mutable",
                   "name": "_ruling",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 6319,
+                  "scope": 6407,
                   "src": "886:15:8",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -454,7 +454,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 6316,
+                    "id": 6404,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "886:7:8",
@@ -474,13 +474,13 @@
           {
             "body": null,
             "documentation": {
-              "id": 6320,
+              "id": 6408,
               "nodeType": "StructuredDocumentation",
               "src": "911:399:8",
               "text": "@dev Give a ruling for a dispute. Must be called by the arbitrator.\nThe purpose of this function is to ensure that the address calling it has the right to rule on the contract.\n@param _disputeID ID of the dispute in the Arbitrator contract.\n@param _ruling Ruling given by the arbitrator. Note that 0 is reserved for \"Not able/wanting to make a decision\"."
             },
             "functionSelector": "311a6c56",
-            "id": 6327,
+            "id": 6415,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -488,17 +488,17 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 6325,
+              "id": 6413,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 6322,
+                  "id": 6410,
                   "mutability": "mutable",
                   "name": "_disputeID",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 6327,
+                  "scope": 6415,
                   "src": "1330:18:8",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -507,7 +507,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 6321,
+                    "id": 6409,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "1330:7:8",
@@ -521,12 +521,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 6324,
+                  "id": 6412,
                   "mutability": "mutable",
                   "name": "_ruling",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 6327,
+                  "scope": 6415,
                   "src": "1350:15:8",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -535,7 +535,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 6323,
+                    "id": 6411,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "1350:7:8",
@@ -551,19 +551,19 @@
               "src": "1329:37:8"
             },
             "returnParameters": {
-              "id": 6326,
+              "id": 6414,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "1375:0:8"
             },
-            "scope": 6328,
+            "scope": 6416,
             "src": "1316:60:8",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 6329,
+        "scope": 6417,
         "src": "531:848:8"
       }
     ],
@@ -575,7 +575,7 @@
   },
   "networks": {},
   "schemaVersion": "3.3.0",
-  "updatedAt": "2020-12-15T14:30:56.886Z",
+  "updatedAt": "2020-12-16T10:00:25.735Z",
   "devdoc": {
     "methods": {
       "rule(uint256,uint256)": {

@@ -1,7 +1,14 @@
+import 'date-fns';
 import React, {Component} from 'react';
 import {Container, TextField, MenuItem, Button} from '@material-ui/core/'
 import generateMetaEvidence from './generate-meta-evidence.js'
 import CardMedia from '@material-ui/core/CardMedia'
+import {
+  MuiPickersUtilsProvider,
+  KeyboardTimePicker,
+  KeyboardDatePicker,
+} from '@material-ui/pickers';
+import DateFnsUtils from '@date-io/date-fns';
 
 
 const categories = [
@@ -30,7 +37,8 @@ class CreateMarket extends Component {
       question: '',
       options: [],
       optionsDesc: [],
-      endTime: 0
+      endTime: 0,
+      dateTime: new Date()
     }
   }
 
@@ -66,8 +74,9 @@ class CreateMarket extends Component {
     this.setState({options})
   }
 
-  handleChangeEndTime = (event) => {
-    this.setState({endTime: event.target.value})
+  handleDateChange = (date) => {
+    this.setState({dateTime: date})
+    this.setState({endTime: Math.round(date.getTime()/1000)})
   }
 
   handleSubmit = (e) => {
@@ -124,7 +133,33 @@ class CreateMarket extends Component {
         }
         </div>
         <div>
-          <TextField label="When to stop accepting bets (UNIX)" fullWidth value={this.state.endTime} onChange={this.handleChangeEndTime}/>
+        <br />
+        When to stop accepting bets?
+        <MuiPickersUtilsProvider utils={DateFnsUtils}>
+          <KeyboardDatePicker
+                    margin="normal"
+                    id="date-picker-dialog"
+                    label="Date"
+                    format="dd/MM/yyyy"
+                    value={this.state.dateTime}
+                    onChange={this.handleDateChange}
+                    KeyboardButtonProps={{
+                      'aria-label': 'change date',
+                    }}
+                    fullWidth
+                  />
+          <KeyboardTimePicker
+                    margin="normal"
+                    id="time-picker"
+                    label="Time"
+                    value={this.state.dateTime}
+                    onChange={this.handleDateChange}
+                    KeyboardButtonProps={{
+                      'aria-label': 'change time',
+                    }}
+                    fullWidth
+                  />
+          </MuiPickersUtilsProvider>
         </div>
         <div>
           Note: New markets require $100 to fund initial liquidity.
@@ -134,7 +169,7 @@ class CreateMarket extends Component {
           width: '50%',
           padding: 10
           }}>
-          <Button colour="primary" type="submit" size="large" style = {{backgroundColor: "#ED1C24", color : "#FFFFFF"}}  variant="contained" component="span" onClick={this.handleSubmit}> Submit</Button>
+            <Button colour="primary" type="submit" size="large" style = {{backgroundColor: "#ED1C24", color : "#FFFFFF"}}  variant="contained" component="span" onClick={this.handleSubmit}> Submit</Button>
           </div>
         </form>
         </Container>
