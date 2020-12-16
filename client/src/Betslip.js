@@ -56,8 +56,40 @@ class BetPositions extends Component {
     }
   }
 
-  parseRedeemButtonCombo() {
-    return ("hi")
+  parseRedeemButtonCombo(eventData,comboPositions, betid) {
+    var output = 1;
+    var i = comboPositions.map(function(o) {return BN.from(o.position).toHexString();}).indexOf(BN.from(betid).toHexString())
+    var comboBet = comboPositions[i]
+
+    var outputArray = []
+
+    comboBet.addresses.map((events,keys) => {
+      var j = eventData.map(function(o) {return o.address;}).indexOf(events)
+      if(eventData[j].outcome == 0) {
+        outputArray.push(0)
+      } else if(comboBet.outcomes[keys] & (1<<eventData[j].outcome) != 0) {
+        outputArray.push(1)
+      } else {
+        outputArray.push(-1)
+      }
+
+    })
+
+    outputArray.map((op) => {
+      if(op == -1 ) {
+        output = -1
+      } else if(op == 0 && output>= 0) {
+        output = 0
+      }
+    })
+
+    if(output == 0) {
+      return (<Button>🟡 pending</Button>)
+    } else if (output == 1) {
+      return(<Button>🟢 Claim</Button>)
+    } else if (output == -1) {
+      return (<Button>🔴 {"C-".repeat(outputArray.length-1)}COMBO BREAKER</Button>)
+    }
   }
 
   tryParseComboBet(state, id, amount) {
@@ -75,7 +107,7 @@ class BetPositions extends Component {
       output += state.eventData[index].title.toUpperCase()+"("+this.parseOutcome(state.eventData[index].options,outcomearray[koEvent])+") "
     })
     return (
-        <div>${amount}: {output}</div>
+        `$${amount}: ${output}`
       )
   }
 
@@ -103,8 +135,13 @@ class BetPositions extends Component {
               ${bet.amount}: {title}({outcome}) {this.parseRedeemButtonSingle(this.props.state.eventData[i].outcome,betoutcome,this.props.state.eventData[i].address)}
               </div>
             )
-          } else {
-            {return(this.tryParseComboBet(this.props.state, bet.id, bet.amount))} {return(this.parseRedeemButtonCombo())}
+          } else if(this.props.state.comboPositions.map(function(o) {return BN.from(o.position).toHexString();}).indexOf(BN.from(bet.id).toHexString()) >= 0) {
+            {return(
+              <div>
+              {this.tryParseComboBet(this.props.state, bet.id, bet.amount)}
+              {this.parseRedeemButtonCombo(this.props.state.eventData,this.props.state.comboPositions, bet.id)}
+              </div>
+            )}
           }
         })}
       </div>
