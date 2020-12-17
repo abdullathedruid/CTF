@@ -13,7 +13,7 @@ The main advantage of decentralised betting markets is their permissionless aspe
 - Anyone can participate. No need for KYC, and no censorship. It doesn't matter if you live in legally complex jurisdictions like Cuba, Burma, South Sudan, North Korea or the United States, anyone with access to the Ethereum blockchain can participate.
 - Anyone can create markets. This captures the long tail of the market that centralised exchanges do not even know about. Your favourite e-sports team is going to have a match and you want to bet on them? You are convinced favourite youtuber is going to break up with her boyfriend? Think Tether is going to implode? Go and create a market.
 
-As the first place in the KLEROS hackathon we created an MVP for a betting exchange where anyone can create a market and anyone can participate (using KLEROS to settle disputes). For more info click [here](https://docs.google.com/presentation/d/16vEH2UnRrnTMHQSUnnPcE89CQRVJQxrqghoi4duKr3I/edit?usp=sharing) and [here (KOVAN)](https://github.com/dpball/supremecourt) desu.  Now we will build upon our previous award winning work and the Gnosis Conditional Token Framework to create a further feature.
+As the first place in the KLEROS hackathon we created an MVP for a betting exchange where anyone can create a market and anyone can participate (using KLEROS to settle disputes). For more info click [here](https://docs.google.com/presentation/d/16vEH2UnRrnTMHQSUnnPcE89CQRVJQxrqghoi4duKr3I/edit?usp=sharing) and [here](https://github.com/dpball/supremecourt) desu.  Now we will build upon our previous award winning work and the Gnosis Conditional Token Framework to create a further feature.
 
 ## Accumulator bets
 
@@ -26,13 +26,21 @@ According to centralised [betting exchange provider Betfair](https://betting.bet
 > The attraction to accumulators is, for many people, two-fold. Most importantly, the combination of four or more different selections means that all the different odds get combined, creating the potential for some remarkable wins and odds that are very difficult to find on standard match betting.
 
 
-We intend to use the the Gnosis Conditional token framework gives users the ability to customise their own bets *however they want*. This grants users an unparalleled ability to gamble. Think that Donald Trump will be inaugurated on the 20th of January and Bitcoin will hit 20k by December 2021? Why not combine the bets to accumulate odds and maximise your winnings.
+We intend to use the the Gnosis Conditional token framework gives users the ability to customise their own bets *however they want*. This grants users an unparalleled ability to gamble. Think that Donald Trump will be inaugurated on the 20th of January and Bitcoin will hit 30k by December 2021? Why not combine the bets to accumulate odds and maximise your winnings.
 
 The aim is to price and make possible any sort of combination. For example:
 - All 3 outcomes of 3 bets occur.
 - At least 2 out of 3 outcomes occur.
 - At least 1  out of the 3 outcomes occur.
 
+
+## Technical elements
+
+### Oracle solution: KLEROS
+
+The market is first decided by the initial liquidity provider (market creator). If it is disputed, it is resolved by a Kleros court. For more details read [here (KOVAN)](https://github.com/dpball/supremecourt).
+
+### Conditional Token Framework
 
 
 ## For future reference
