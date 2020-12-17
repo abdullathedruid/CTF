@@ -46,7 +46,13 @@ The market is first decided by the initial liquidity provider (market creator). 
 
 ### Conditional Token Framework
 
-The CTR is being used to manage all events you can bet on. When the user creates a market, it calls `ConditionPreparation` function. When the use places a bet, it calls `splitPosition` function from the conditional betting function, which can also work recursively. When users redeem positions it calls the same function but rather backwards.
+The CTF is being used to manage all events you can bet on. 
+
+When a user creates a betting market, it calls the `conditionPreparation` function. 
+
+When the user places a bet, it calls `splitPosition` function. For the combo bets, this is done recursively making use of `parentCollectionId`. 
+
+When users want to redeem their positions, the same functions above are called in inverse order in order to redeem collateral 
 
 
 ### IPFS
