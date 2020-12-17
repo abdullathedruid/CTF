@@ -1,8 +1,11 @@
+<iframe width="560" height="315" src="https://www.youtube.com/embed/mF_0OnfhJiw" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
 # PROJECT C-C-COMBOBREAKER
 
 <center>
 ![image](funky_owl.png)
 </center>
+
 
 ## Introduction
 
@@ -42,7 +45,8 @@ The market is first decided by the initial liquidity provider (market creator). 
 
 ### Conditional Token Framework
 
+The CTR is being used to manage all events you can bet on. When the user creates a market, it calls `ConditionPreparation` function. When the use places a bet, it calls `splitPosition` function from the conditional betting function, which can also work recursively. When users redeem positions it calls the same function but rather backwards.
 
-## For future reference
 
-- https://www.youtube.com/watch?v=kliI-KvNW4w&ab_channel=%C2%A1ZizZaz%21
+### IPFS
+All the data and descriptions are being stored on IPFS and the hashes are secured on the blockchain.
