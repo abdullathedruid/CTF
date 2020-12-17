@@ -16,6 +16,8 @@ import FakeDai from './contracts/FakeDai.json'
 import Router from './contracts/Router.json'
 import ConditionalTokens from './contracts/ConditionalTokens.json'
 
+import RefreshIcon from '@material-ui/icons/Refresh';
+
 const ipfs = require("nano-ipfs-store").at("https://ipfs.infura.io:5001");
 
 var ethers = require('ethers')
@@ -311,7 +313,23 @@ class App extends Component {
         } catch (err) {
           console.log('Error', err)
         }
-    //function redeemPositions(IERC20 collateralToken, bytes32 parentCollectionId, bytes32 conditionId, uint[] calldata indexSets) external {
+  }
+
+  handleComboClaim = (events,outcomes) => {
+    var conditions = []
+    events.map((ev,ke) => {
+      var index = this.state.eventData.map(function(o) {return o.address;}).indexOf(ev)
+      conditions.push(this.state.eventData[index].condition)
+    })
+    var curr = this.state.currency._address
+    try{
+          this.state.ct.methods.redeemComboPosition(curr,conditions,outcomes).send({from: this.state.account})
+          .once('receipt', ((receipt) => {
+            console.log('Combo Bet Redeemed')
+          }))
+        } catch (err) {
+          console.log('Error', err)
+        }
   }
 
   addEventData (address,title,description,question,options,endTime,resultTime, outcome, price, balances, state, owner,condition) {
@@ -363,10 +381,10 @@ class App extends Component {
 
     this.setState({web3})
 
-    var currencyaddress = '0x5C9F81D6C578E7Ff376DDDE33612718D6F28D7ac'
-    var ctaddress = '0x9C0F6d42A275035e285add4BE195f13ec8d14534'
-    var factoryaddress = '0x18577AcA3eFc697Cc91D85b965B04994f24522A1'
-    var routeraddress = '0x5CD363d4363AbAFf407c6E3bD640E7823Aa2faad'
+    var currencyaddress = '0x0096ff9F9Cb550D2CAb2DAb84092B1097b4073C9'
+    var ctaddress = '0xe740563234F5e6eF1A13888e7558863aACD0820c'
+    var factoryaddress = '0xd4D9e34d764681ABf3337f2dbE16B30de675Ac3A'
+    var routeraddress = '0xB5fdefDFB00E4EA7E79f7890eB1BB383eDF1Deb3'
 
 
     const factory = new web3.eth.Contract(FactoryContract.abi, factoryaddress)
@@ -421,6 +439,14 @@ class App extends Component {
       }
       this.setState({comboPositions: [...this.state.comboPositions, obj]})
     }))
+
+    const ctethers = new ethers.Contract(ctaddress,ConditionalTokens.abi,ethersprovider)
+    let filterct = ctethers.filters.ConditionResolution(null)
+    let tempout = await ctethers.queryFilter(filterct,0,await ethersprovider.getBlockNumber())
+    Promise.all(tempout.map((log, key) => {
+      console.log(log)
+    }
+  ))
 
     let tokens = await ct.getPastEvents('TransferSingle', {fromBlock: 0, toBlock: 'latest'})
     Promise.all(tokens.map(async (ev,ke) => {
@@ -608,6 +634,7 @@ class App extends Component {
         }}> Give me $1000! </Button>
           <Button colour="primary" type="submit" size="large" style = {{backgroundColor: "#FFFFFF", color : "#ED1C24"}}  variant="contained" component="span" onClick={this.handleApprove}> Approve All </Button>
           </div>
+          <RefreshIcon onClick={()=>{this.forceUpdate()}}/>
         </AppBar>
       </header>
     <main>
@@ -621,7 +648,7 @@ class App extends Component {
         <Bets handleDispute={this.handleDispute} handleSetOutcome = {this.handleSetOutcome} handleOpenSetOutcome={this.handleOpenSetOutcome} handleCloseSetOutcome={this.handleCloseSetOutcome} handlePlaceBet={this.handlePlaceBet} handleChangePurchaseSize={this.handleChangePurchaseSize} state={this.state} openSetOutcome={this.state.openSetOutcome} open={this.state.openBet} handleClose={this.handleCloseBet} handleOpen={this.handleOpenBet}/>
       </Grid>
       <Grid item xs={4}>
-        <Betslip handleSingleClaim={this.handleSingleClaim} handleComboSubmit={this.handleComboSubmit} handleSingleSubmit={this.handleSingleSubmit} handleChangePurchaseSingleSize={this.handleChangePurchaseSingleSize} handleChangePurchaseComboSize={this.handleChangePurchaseComboSize} alterBet={this.alterBet} handleRemoveBet={this.handleRemoveBet} handleDisputeOutcome={this.handleDisputeOutcome} state={this.state}/>
+        <Betslip handleComboClaim={this.handleComboClaim} handleSingleClaim={this.handleSingleClaim} handleComboSubmit={this.handleComboSubmit} handleSingleSubmit={this.handleSingleSubmit} handleChangePurchaseSingleSize={this.handleChangePurchaseSingleSize} handleChangePurchaseComboSize={this.handleChangePurchaseComboSize} alterBet={this.alterBet} handleRemoveBet={this.handleRemoveBet} handleDisputeOutcome={this.handleDisputeOutcome} state={this.state}/>
       </Grid>
     </Grid>
     </main>

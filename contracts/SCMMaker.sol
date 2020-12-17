@@ -249,7 +249,7 @@ contract SCMMaker is IArbitrable, IEvidence, ISCMMaker, IERC1155Receiver{
         require(block.timestamp > resultTimestamp,'TOO EARLY TO DECIDE OUTCOME');
         require(status == Status.BettingOpen || status == Status.NoMoreBets,"INVALID STATE");
         //With this implementation, the user can still set the outcome after 24h but only if nobody else has disputed
-        require(_outcome < numOfOutcomes+1,"INVALID OUTCOME!!");
+        //require(_outcome < numOfOutcomes+1,"INVALID OUTCOME!!");
         outcome = _outcome;
         status = Status.Appealable;
         appealTimestamp = block.timestamp + DISPUTE_TIME;
