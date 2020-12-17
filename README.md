@@ -5,9 +5,8 @@
 
 Click image below for video.
 
-<center>
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/mF_0OnfhJiw/0.jpg)](https://www.youtube.com/watch?v=mF_0OnfhJiw)
-</center>
+
 
 ## Introduction
 
