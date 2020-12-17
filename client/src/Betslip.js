@@ -229,7 +229,7 @@ class Betslip extends Component {
           <Button colour="primary" onClick={
             () => {
           start();
-          this.handleSingleSubmit();
+          this.props.handleSingleSubmit();
         }
             } type="submit" size="large" style = {{backgroundColor: "#ED1C24", color : "#FFFFFF"}}  variant="contained" component="span" > Submit single bet </Button>
         </div>

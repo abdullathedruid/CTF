@@ -58,7 +58,7 @@ class App extends Component {
       positions: [],
       singleCollectionId: [],
       singlePositionId: [],
-      comboPositions: []
+      comboPositions: [],
     }
     this.addEventData = this.addEventData.bind(this)
   }
@@ -323,7 +323,7 @@ class App extends Component {
     })
     var curr = this.state.currency._address
     try{
-          this.state.ct.methods.redeemComboPosition(curr,conditions,outcomes).send({from: this.state.account})
+          this.state.ct.methods.redeemComboPositions(curr,conditions,outcomes).send({from: this.state.account})
           .once('receipt', ((receipt) => {
             console.log('Combo Bet Redeemed')
           }))
@@ -381,10 +381,10 @@ class App extends Component {
 
     this.setState({web3})
 
-    var currencyaddress = '0x0096ff9F9Cb550D2CAb2DAb84092B1097b4073C9'
-    var ctaddress = '0xe740563234F5e6eF1A13888e7558863aACD0820c'
-    var factoryaddress = '0xd4D9e34d764681ABf3337f2dbE16B30de675Ac3A'
-    var routeraddress = '0xB5fdefDFB00E4EA7E79f7890eB1BB383eDF1Deb3'
+    var currencyaddress = '0x13fBEae64F1B33FD5d3CB3464813073b6F88a1Ad'
+    var ctaddress = '0x468F186229FC952729d5be1a423C71140612fdFE'
+    var factoryaddress = '0x02edD979D3ce11770aFADF1Ef5B05EaBc2790367'
+    var routeraddress = '0x21da1cF5CC9fd5425e52387218dd58581629B75E'
 
 
     const factory = new web3.eth.Contract(FactoryContract.abi, factoryaddress)
@@ -621,7 +621,6 @@ class App extends Component {
       <React.Fragment>
       <header>
         <AppBar position="static" style = {{backgroundColor: "#ED1C24"}} >
-          <img style={{ width: "50%" }} src="supreme_header.png" />
           <Typography variant="h6" noWrap>
             Your address: {this.state.account}
           </Typography>
