@@ -31,6 +31,10 @@ class BetPositions extends Component {
   handleSingleClaim = (events,outcome) => {
     this.props.handleSingleClaim(events,outcome)
   }
+
+  handleComboClaim = (events,outcomes) => {
+    this.props.handleComboClaim(events,outcomes)
+  }
   //function redeemPositions(IERC20 collateralToken, bytes32 parentCollectionId, bytes32 conditionId, uint[] calldata indexSets) external {
 
   parseOutcome(options,outcome) {
@@ -89,10 +93,12 @@ class BetPositions extends Component {
       }
     })
 
+    console.log(comboBet)
+
     if(output == 0) {
       return (<Button>🟡 pending</Button>)
     } else if (output == 1) {
-      return(<Button>🟢 Claim</Button>)
+      return(<Button onClick={() => this.handleComboClaim(comboBet.addresses,comboBet.outcomes)} >🟢 Claim</Button>)
     } else if (output == -1) {
       return (<Button>🔴 {"C-".repeat(outputArray.length-1)}COMBO BREAKER</Button>)
     }
@@ -183,7 +189,7 @@ class Betslip extends Component {
       return(
         <Container>
         <img style={{ width: "100%"}} src="cb2.png" />
-          <BetPositions state={this.props.state} />
+          <BetPositions handleComboClaim={this.props.handleComboClaim} handleSingleClaim={this.props.handleSingleClaim}  state={this.props.state} />
         </Container>
       )
     } else if(this.props.state.betslip.length==1) {
@@ -191,7 +197,7 @@ class Betslip extends Component {
         <Container>
         <img style={{ width: "100%"}} src="cb2.png" />
         <div>
-          <BetPositions handleSingleClaim={this.props.handleSingleClaim} state={this.props.state} />
+          <BetPositions handleComboClaim={this.props.handleComboClaim} handleSingleClaim={this.props.handleSingleClaim} state={this.props.state} />
         <List>
         {this.props.state.betslip.map((bet, key)=> {
           return(
@@ -235,7 +241,7 @@ class Betslip extends Component {
         <Container>
         <img style={{ width: "100%"}} src="cb2.png" />
         <div>
-          <BetPositions state={this.props.state}/>
+          <BetPositions handleComboClaim={this.props.handleComboClaim} handleSingleClaim={this.props.handleSingleClaim} state={this.props.state}/>
         <List>
         {this.props.state.betslip.map((bet, key)=> {
           return(
